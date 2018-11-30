@@ -4,7 +4,7 @@ Split data into a train and a test set. i.e. the script creates
 
     ./data/<DATASET>/ train.csv test.csv
 
-where <DATASET> is either red-wine or ...
+where <DATASET> is either wine or ...
 
 To run this script:
     python data/split.py --data red-wine --train_size 0.85
@@ -14,18 +14,13 @@ import random
 import pickle
 import pandas
 
-ORIGINAL_DATA_PATH = './original/smsSpamCollection.csv'
-
 def argparser():
     """
     Command line argument parser
     """
-    parser = argparse.ArgumentParser(description='Image classifier implementation')
-    parser.add_argument('--spam_percentage', '-spam', type=float, default=None)
-    parser.add_argument('--train_size', type=float, default=0.75)
-    parser.add_argument('--valid_size', type=float, default=0.15)
-    parser.add_argument('--test_size', type=float, default=0.15)
-    parser.add_argument('--out_dir', type=str, default='.')
+    parser = argparse.ArgumentParser(description='Train test split')
+    parser.add_argument('--train_size', type=float, default=0.85)
+    parser.add_argument('--data', type=str, choices=['wine'])
     return parser.parse_args()
 
 def load_data(path):
@@ -34,32 +29,16 @@ def load_data(path):
     """
     return pandas.read_table(path, delimiter=',')
 
-def select_spam(dataframe, spam_percentage):
-    """
-    Keep `spam_percentage` of the spam and
-    remove the rest. Return the new dataframe
-    """
-    if spam_percentage:
-        spam_idx = dataframe.index[dataframe['target'] == 'spam'].tolist()
-        len_ham = len(dataframe) - len(spam_idx)
-        len_spam = int(spam_percentage * len_ham / (1 - spam_percentage))
-        idx_to_remove = random.sample(spam_idx, len(spam_idx) - len_spam)
-        dataframe = dataframe.drop(idx_to_remove, axis=0)
-    return dataframe
-
-def _split_indices(data, split):
-    storage = {'train': [], 'valid': [], 'test': []}
+def _split_indices(data, train_size):
+    storage = {'train': [], 'test': []}
     data_size = len(data)
-    train_size = round(data_size * split[0])
-    valid_size = round(data_size * split[1])
+    train_size = round(data_size * train_size)
     examples = range(len(data))
     storage['train'] = random.sample(examples, train_size)
-    examples = [ex for ex in examples if ex not in storage['train']]
-    storage['valid'] = random.sample(examples, valid_size)
-    storage['test'] = [ex for ex in examples if ex not in storage['valid']]
+    storage['test'] = [ex for ex in examples if ex not in storage['train']]
     return storage
 
-def split_data(dataframe, split):
+def split_data(dataframe, train_size):
     """
     Split the data into a training set
     and a test set according to 'train_size'
@@ -68,35 +47,29 @@ def split_data(dataframe, split):
         dataframe: (pandas.Dataframe)
         split: (list of float) train/valid/test split 
     """
-    split_idx = _split_indices(dataframe, split)
+    split_idx = _split_indices(dataframe, train_size)
     train_data = dataframe.iloc[split_idx['train']]
-    valid_data = dataframe.iloc[split_idx['valid']]
     test_data = dataframe.iloc[split_idx['test']]
-    return train_data, valid_data, test_data
+    return train_data, test_data
 
-def save_data(dataframe, name, args):
+def save_data(dataframe, args, train=True):
     """
     Save a dictionary data to a pickle file
     """
-    out_dir = '{}/{}{}.csv'.format(
-        args.out_dir, name, args.spam_percentage)
+    data = 'train' if train else 'test'
+    out_dir = './data/{}/{}.csv'.format(args.data, data)
     dataframe.to_csv(out_dir, index=False)
 
 def main(args):
     """
     wrapper - create the data<spam_percentage>.csv file
     """
-    split = [args.train_size, args.valid_size, args.test_size]
-    data = load_data(ORIGINAL_DATA_PATH)
-    data = select_spam(data, args.spam_percentage)
-    train_data, valid_data, test_data = split_data(data, split)
+    data_path = './data/{}/data.csv'.format(args.data)
+    data = load_data(data_path)
+    train_data, test_data = split_data(data, args.train_size)
     
-    if not args.spam_percentage:
-        args.spam_percentage = ''
-    
-    save_data(train_data, 'train', args)
-    save_data(valid_data, 'valid', args)
-    save_data(test_data, 'test', args)
+    save_data(train_data, args, train=True)
+    save_data(test_data, args, train=False)
 
 if __name__ == '__main__':
     main(argparser())
