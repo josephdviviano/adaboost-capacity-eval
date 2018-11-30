@@ -86,12 +86,12 @@ def Decision_tress(data, adaboost=True):
     LOGGER.debug('building decision tree model')
     # hyperparameters to search for randomized cross validation
     settings = {
-        'clf__max_depth': stats.randint(1,12),
+        'clf__max_depth': stats.randint(1,12)
         #'clf__min_samples_split': stats.randint(1,5),
         #'clf__min_samples_leaf': stats.randint(1,5),
         #'clf__max_features': stats.randint(1,12)
     }
-    #Not used: criterion, splitter, random_stat, max_leaf_nodes, min_impurity_decrease, min_impurity_split, class_weight
+    #Not used: max_features, criterion, splitter, random_stat, max_leaf_nodes,min_samples_split, clf__min_samples_leaf, min_impurity_decrease, min_impurity_split, class_weight
 
     # model we will train in our pipeline
     clf = DecisionTreeRegressor()
