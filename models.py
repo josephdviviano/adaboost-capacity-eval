@@ -88,7 +88,7 @@ def SVM_nonlinear(data):
 
 
 
-def Boosted_SVM(data):
+def boosted_SVM(data):
     """ baseline: linear classifier (without kernel)"""
     LOGGER.debug('building SVM model')
     # hyperparameters to search for randomized cross validation
