@@ -98,10 +98,10 @@ def svm_nonlinear(data):
     return(results, best_model)
 
 
-def svm_baseline(data):
+def boosted_svm_baseline(data):
     """baseline: SVM (without Kernel)"""
 
-    model = models.SVM(data) # returns a model ready to train
+    model = models.boosted_SVM(data) # returns a model ready to train
     results, best_model = kfold_train_loop(data, model)
 
     return(results, best_model)
