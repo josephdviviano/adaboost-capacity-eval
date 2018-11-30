@@ -38,14 +38,15 @@ def load_wine(test_mode=False, valid_pct=0.1):
     loads the data into a structure for SCIKIT LEARN. data is stored as
     (n_subjects x n_features).
     """
-    X_train = np.load('data/train_images.npy', encoding='latin1')
-    X_test  = np.load('data/test_images.npy', encoding='latin1')
-    y_train = np.genfromtxt('data/train_labels.csv', names=True, delimiter=',',
-        dtype=[('Id', 'i8'), ('Category', 'S20')])
-    y_test  = np.genfromtxt('data/train_labels.csv', names=True, delimiter=',',
-        dtype=[('Id', 'i8'), ('Category', 'S20')])
-
-    # get data into numpy matrices
+    #load data
+    data_train = np.genfromtxt('data/name1.csv', name=True, delimiter=',', dtype=[('Id', 'i8'), ('Category', 'S20')])
+    date_test = np.genfromtxt('data/name2.csv', name=True, delimiter=',', dtype=[('Id', 'i8'), ('Category', 'S20')])
+    
+    #split into X and y
+    X_train = data_train[:int((1-test_pct-valid_pct)*data.shape[0]),:-1].astype(float)
+    X_test  = data_test[int((1-test_pct)*data.shape[0]):,:-1].astype(float)
+    y_train = data_train[:int((1-test_pct-valid_pct)*data.shape[0]),-1]
+    y_test  = data_train[int((1-test_pct)*data.shape[0]):,-1]
 
     # test_mode uses a small subset of the data
     if test_mode:
