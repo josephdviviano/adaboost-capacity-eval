@@ -70,7 +70,7 @@ def main(test_mode=False):
     #lr_y_test = utils.convert_y(lr_pred['test'], y_map)
     #utils.write_results('results/lr_baseline.csv', lr_y_test)
 
-    svm_pred, svm_model = exp.svm_baseline(data)
+    svm_pred, svm_model = exp.boosted_svm_baseline(data)
     #svm_pred, svm_model = exp.svm_nonlinear(data)
     #svm_y_test = utils.convert_y(svm_pred['test'], y_map)
     #utils.write_results('results/svm_baseline.csv', svm_y_test)
