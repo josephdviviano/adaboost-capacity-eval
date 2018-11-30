@@ -149,10 +149,9 @@ def Decision_tress(data, adaboost=True):
         'dim__n_components': stats.randint(10, 400),
         'clf__tol': stats.uniform(10e-5, 10e-1),
         'clf__C': stats.uniform(10e-3, 10),
-        'clf__penalty': ['l1', 'l2']
-        'clf__max_depth': stats.randint(1,12)
-        'clf__min_samples_split: stats.randint(1,5)
-        'clf__min_samples_leaf: stats.randint(1,5)
+        'clf__max_depth': stats.randint(1,12),
+        'clf__min_samples_split: stats.randint(1,5),
+        'clf__min_samples_leaf: stats.randint(1,5),
         'clf__max_features: stats.randint(1,12)
     }
     #Not used: criterion, splitter, random_stat, max_leaf_nodes, min_impurity_decrease, min_impurity_split, class_weight
