@@ -13,6 +13,9 @@ warnings.filterwarnings("ignore",category=DeprecationWarning)
 '''remove annoying DeprecationWarning from sk-learn script
 '''
 
+CORR_FEATURES = [0, 1, 3, 4, 5, 8, 9, 10, 11]
+CORR_FEATURES = [2, 6, 7]
+
 LOGGER = logging.getLogger(os.path.basename(__file__))
 
 def write_results(y_pred, y_true):
@@ -21,7 +24,7 @@ def write_results(y_pred, y_true):
     """
     pass
 
-def load_wine(test_mode=False, valid_pct=0.1):
+def load_wine(test_mode=False, valid_pct=0.2, remove_corr_features=True):
     """
     loads the data into a structure for SCIKIT LEARN. data is stored as
     (n_subjects x n_features).
@@ -35,6 +38,15 @@ def load_wine(test_mode=False, valid_pct=0.1):
     X_test  = data_test[:, :-1]
     y_train = data_train[:, -1]
     y_test  = data_train[:, -1]
+
+    if remove_corr_features:
+        col = [0, 1, 3, 4, 5, 8, 9, 10, 11]
+        all_features = list(range(X_train.shape[1]+1))
+        keep_features = [x for x in all_features if x not in CORR_FEATURES] 
+        #print(keep_features)
+        #exit()
+        X_train = data_train[:, keep_features]
+        X_test  = data_test[:, keep_features]
 
     # to few examples for these two the
     # classes 3 and 9. Creates bugs when 

@@ -34,16 +34,17 @@ def main(args):
     # run experiments
     # TODO: add other models
     if args.model == 'decision_tree':
-        results, best_model = exp.decision_tree(data)
-    utils.write_results('results/wine.csv', results)
-
+        results, best_model = exp.decision_tree(data, args.adaboost)
+        #print(best_model.cv_results_)
+        utils.write_results('results/wine.csv', results)
 
 if __name__ == "__main__":
 
     argparser = argparse.ArgumentParser()
     argparser.add_argument("-v", "--verbose", action="store_true", help="increase output verbosity")
     argparser.add_argument("-t", "--test", action="store_true", help="training set size=500")
-    argparser.add_argument("-m", "--model", help="which model")
+    argparser.add_argument("-m", "--model", help="which model?")
+    argparser.add_argument("-ada", "--adaboost", help="Should adaboost be used?")
     args = argparser.parse_args()
 
     if args.verbose:
@@ -52,5 +53,3 @@ if __name__ == "__main__":
         LOGGER.setLevel(logging.INFO)
 
     main(args)
-
-

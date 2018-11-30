@@ -20,28 +20,24 @@ LOGGER = logging.getLogger(os.path.basename(__file__))
 
 # global settings for all cross-validation runs
 SETTINGS = {
-    'n_cv': 25,
+    'n_cv': 50,
     'n_inner': 3,
 }
 
 # controls how chatty RandomizedCV is
 VERB_LEVEL = 0
 
-def decision_tree(data, adaboost=True):
-    LOGGER.debug('building decision tree model')
-    # hyperparameters to search for randomized cross validation
+def _tree():
+
     settings = {
-        'dim__n_components': stats.randint(1, 11),
-        #'clf__max_depth': stats.randint(1, 12),
-        #'clf__min_samples_split': stats.randint(2, 5),
-        #'clf__min_samples_leaf': stats.randint(1, 5),
-        #'clf__max_features': stats.randint(1, 12)
-        #'clf__n_estimators':[25,30,35,40,45,50],
-        #'clf__learning_rate':[0.01,0.02,0.04,0.08,0.16,0.32,0.64,1.28,2.56]
-        
+        'dim__n_components': stats.randint(4, 8),
+        'clf__max_depth': stats.randint(1, 12),
+        'clf__min_samples_split': stats.randint(2, 5),
+        'clf__min_samples_leaf': stats.randint(1, 5),
+        'clf__max_features': stats.randint(1, 12)
     }
 
-    clf = AdaBoostClassifier(DecisionTreeClassifier())
+    clf = DecisionTreeClassifier(criterion='entropy')
 
     pipeline = Pipeline([
         ('pre', StandardScaler()),
@@ -50,10 +46,44 @@ def decision_tree(data, adaboost=True):
     ])
 
     # this will learn our best parameters for the final model
-    model = RandomizedSearchCV(pipeline, settings, n_jobs=-1, verbose=VERB_LEVEL,
+    model = RandomizedSearchCV(pipeline, settings, n_jobs=3, verbose=VERB_LEVEL,
         n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_inner'], scoring='accuracy'
     )
 
+    return model
+
+def _forest(adaboost=True):
+    
+    settings = {
+        'dim__n_components': stats.randint(4, 8),
+        'clf__n_estimators': stats.randint(25, 50),
+        'clf__learning_rate': stats.uniform(0.1, 2.)
+    }
+
+    clf = AdaBoostClassifier(DecisionTreeClassifier(criterion='entropy', max_depth=8, max_features='auto'))
+
+    pipeline = Pipeline([
+        ('pre', StandardScaler()),
+        ('dim', PCA(svd_solver='randomized')),
+        ('clf', clf),
+    ])
+
+    # this will learn our best parameters for the final model
+    model = RandomizedSearchCV(pipeline, settings, n_jobs=3, verbose=VERB_LEVEL,
+        n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_inner'], scoring='accuracy'
+    )
+
+    return model
+
+def decision_tree(adaboost=True):
+    """
+    Build decision tree model
+    """
+    LOGGER.info('Building decision tree model with adaboost set to: {}'.format(adaboost))
+    if adaboost:
+        model = _forest()
+    else:
+        model = _tree()
     return model
 
 

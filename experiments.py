@@ -71,11 +71,11 @@ def kfold_train_loop(data, model):
 
     return results, best_model
 
-def decision_tree(data):
+def decision_tree(data, adaboost):
     """
     Decision tree experiment
     """
-    model = models.decision_tree(data) # returns a model ready to train
+    model = models.decision_tree(adaboost)
     results, best_model = kfold_train_loop(data, model)
 
     return results, best_model
