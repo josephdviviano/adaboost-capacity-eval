@@ -146,9 +146,6 @@ def Decision_tress(data, adaboost=True):
     LOGGER.debug('building decision tree model')
     # hyperparameters to search for randomized cross validation
     settings = {
-        'dim__n_components': stats.randint(10, 400),
-        'clf__tol': stats.uniform(10e-5, 10e-1),
-        'clf__C': stats.uniform(10e-3, 10),
         'clf__max_depth': stats.randint(1,12),
         'clf__min_samples_split: stats.randint(1,5),
         'clf__min_samples_leaf: stats.randint(1,5),
