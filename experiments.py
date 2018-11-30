@@ -15,7 +15,7 @@ import time
 LOGGER = logging.getLogger(os.path.basename(__file__))
 
 SETTINGS = {
-    'folds': 5,
+    'folds': 3,
 }
 
 

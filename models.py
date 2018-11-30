@@ -9,10 +9,14 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
+from sklearn.ensemble import AdaBoostClassifier
 import argparse
 import logging
 import numpy as np
 import os
+
+
+
 
 LOGGER = logging.getLogger(os.path.basename(__file__))
 
@@ -60,13 +64,13 @@ def SVM_nonlinear(data):
     LOGGER.debug('building SVM model')
     # hyperparameters to search for randomized cross validation
     settings = {
-        'dim__n_components': stats.randint(10, 1000),
+        'dim__n_components': stats.randint(1, 11),
         'clf__tol': stats.uniform(10e-5, 10e-1),
         'clf__C': stats.uniform(10e-3, 1)
     }
 
     # model we will train in our pipeline
-    clf = SVC(gamma=0.001, max_iter=100)
+    clf = SVC(gamma=0.001, max_iter=-1)
 
     # pipeline runs preprocessing and model during every CV loop
     pipe = Pipeline([
@@ -89,14 +93,17 @@ def SVM(data):
     LOGGER.debug('building SVM model')
     # hyperparameters to search for randomized cross validation
     settings = {
-        'dim__n_components': stats.randint(10,1000),
-        'clf__tol': stats.uniform(10e-5, 10e-1),
-        'clf__C': stats.uniform(10e-3, 1)
+        'dim__n_components': stats.randint(1,11),
+        'clf__n_estimators':[25,30,35,40,45,50],
+        'clf__learning_rate':[0.01,0.02,0.04,0.08,0.16,0.32,0.64,1.28,2.56]         
     }
 
     # model we will train in our pipeline
-    clf = SVC(kernel='linear', max_iter=100)
-
+    #clf = SVC(kernel='linear', max_iter=-1  )
+    #clf = AdaBoostClassifier(SVC(C=stats.uniform(10e-3, 1), tol=stats.uniform(10e-5, 10e-1),probability=True, kernel='linear' ))
+    clf = AdaBoostClassifier(SVC(C=0.01, tol=0.001,probability=True, kernel='linear' )) 
+    
+    
     # pipeline runs preprocessing and model during every CV loop
     pipe = Pipeline([
         ('pre', StandardScaler()),

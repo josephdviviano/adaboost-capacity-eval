@@ -3,6 +3,7 @@ helper functions
 """
 
 from sklearn.preprocessing import LabelEncoder
+import csv
 import logging
 import matplotlib.pyplot as plt
 import numpy as np
@@ -13,7 +14,7 @@ LOGGER = logging.getLogger(os.path.basename(__file__))
 def get_y_map(data):
     """gets all the unique values in y to allow str <-> int conversion"""
     y_map = LabelEncoder()
-    y_map.fit(data['y']['train'])
+    y_map.fit(data)
     return(y_map)
 
 
@@ -33,35 +34,33 @@ def write_results(y_pred, y_true):
     pass
 
 
-def load_wine(test_mode=False, valid_pct=0.1):
+def load_wine(test_mode=False, valid_pct=0.1, test_pct=0.1):
     """
     loads the data into a structure for SCIKIT LEARN. data is stored as
     (n_subjects x n_features).
     """
-    X_train = np.load('data/train_images.npy', encoding='latin1')
-    X_test  = np.load('data/test_images.npy', encoding='latin1')
-    y_train = np.genfromtxt('data/train_labels.csv', names=True, delimiter=',',
-        dtype=[('Id', 'i8'), ('Category', 'S20')])
-    y_test  = np.genfromtxt('data/train_labels.csv', names=True, delimiter=',',
-        dtype=[('Id', 'i8'), ('Category', 'S20')])
+    data = []
+    data_white = csv.reader(open('data/winequality-white.csv',"rt"), delimiter=';')
+    next(data_white)
+    for row in data_white:
+        data.append(list(row))
+    data_red   = csv.reader(open('data/winequality-red.csv',"rt"), delimiter=';')
+    next(data_red)
+    for row in data_red:
+        data.append(list(row))
 
-    # get data into numpy matrices
-
-    # test_mode uses a small subset of the data
-    if test_mode:
-        LOGGER.info('running in test mode, n=500')
-        n_samples = 500
-    else:
-        n_samples = len(X_train)
-
-    # make validation set
-    n_valid = int(np.floor(valid_pct * n_samples))
-
-    X_valid = X_train[:n_valid, :]
-    X_train = X_train[n_valid:, :]
-    y_valid = y_train[:n_valid]
-    y_train = y_train[n_valid:]
-
+    data= np.array(data)
+    np.random.shuffle(data)
+    
+    X_train = data[:int((1-test_pct-valid_pct)*data.shape[0]),:-1].astype(float)
+    X_valid = data[int((1-valid_pct-test_pct)*data.shape[0]):int((1-test_pct)*data.shape[0]),:-1].astype(float)
+    X_test  = data[int((1-test_pct)*data.shape[0]):,:-1].astype(float)
+    
+    
+    y_train = data[:int((1-test_pct-valid_pct)*data.shape[0]),-1]
+    y_valid = data[int((1-valid_pct-test_pct)*data.shape[0]):int((1-test_pct)*data.shape[0]),-1]
+    y_test  = data[int((1-test_pct)*data.shape[0]):,-1]
+    
     # data is accessed as data['X']['valid']
     data = {'X': {'train': X_train, 'valid': X_valid, 'test': X_test},
             'y': {'train': y_train, 'valid': y_valid, 'test': y_test}
