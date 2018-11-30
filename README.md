@@ -16,3 +16,6 @@ and build from that. They are all set up to work comme ca:`
 + `experiments.py`: the application of some models from `models.py` to the `data/`, to produce predictions.
 + `utils.py`: misc functions that might be useful in any of the other modules.
 
+## Data
+- [Wine Quality](https://archive.ics.uci.edu/ml/datasets/wine+quality)
+
