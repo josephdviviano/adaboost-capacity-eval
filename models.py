@@ -87,7 +87,7 @@ def boosted_SVM(data):
     LOGGER.debug('building SVM model')
     # hyperparameters to search for randomized cross validation
     settings = {
-        'dim__n_components': stats.randint(1,11),
+        'dim__n_components': stats.randint(1, 9),
         'clf__n_estimators':[25,30,35,40,45,50],
         'clf__learning_rate':[0.01,0.02,0.04,0.08,0.16,0.32,0.64,1.28,2.56]         
     }
@@ -118,7 +118,7 @@ def _tree():
         'clf__max_depth': stats.randint(1, 12),
         'clf__min_samples_split': stats.randint(2, 5),
         'clf__min_samples_leaf': stats.randint(1, 5),
-        'clf__max_features': stats.randint(1, 12)
+        'clf__max_features': stats.randint(1, 5)
     }
 
     clf = DecisionTreeClassifier(criterion='entropy')
@@ -129,7 +129,7 @@ def _tree():
         ('clf', clf),
     ])
     
-    model = RandomizedSearchCV(pipeline, settings, n_jobs=3, verbose=VERB_LEVEL,
+    model = RandomizedSearchCV(pipeline, settings, n_jobs=-1, verbose=VERB_LEVEL,
         n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_inner'], scoring='accuracy')
 
     return model  
@@ -142,7 +142,8 @@ def _forest(adaboost=True):
         'clf__learning_rate': stats.uniform(0.1, 2.)
     }
 
-    clf = AdaBoostClassifier(DecisionTreeClassifier(criterion='entropy', max_depth=8, max_features='auto'))
+    clf = AdaBoostClassifier(DecisionTreeClassifier(
+        criterion='entropy', max_depth=8, max_features='auto'))
 
     pipeline = Pipeline([
         ('pre', StandardScaler()),
@@ -150,11 +151,11 @@ def _forest(adaboost=True):
         ('clf', clf),
     ])
     
-    model = RandomizedSearchCV(pipe, settings, n_jobs=-1, verbose=VERB_LEVEL,
+    model = RandomizedSearchCV(pipeline, settings, n_jobs=-1, verbose=VERB_LEVEL,
         n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_inner'], scoring='accuracy'
     )
 
-    return(model)
+    return model
 
 def decision_tree(adaboost=True):
     """
