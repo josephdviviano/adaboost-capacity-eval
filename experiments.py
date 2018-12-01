@@ -48,7 +48,6 @@ def kfold_train_loop(data, model):
 
         # fit model on fold (does all hyperparameter selection ox X_fold_train)
         model.fit(X_fold_train, y_fold_train)
-
         this_model_predictions = model.predict(X_fold_test)
 
         this_model_acc = accuracy_score(this_model_predictions, y_fold_test)
@@ -70,40 +69,25 @@ def kfold_train_loop(data, model):
         'train': y_train_pred, 'valid': y_valid_pred, 'test': y_test_pred
     }
 
-    return(results, best_model)
-
-
-def k_nn(data):
-
-     model = models.k_nn() # returns a model ready to train
-     results, best_model = kfold_train_loop(data, model)
-     return(results, best_model)
-
-
-def lr_baseline(data):
-    """baseline: logistic regression"""
-
-    model = models.logistic_regression(data) # returns a model ready to train
-    results, best_model = kfold_train_loop(data, model)
-
-    return(results, best_model)
-
+    return results, best_model
 
 def svm_nonlinear(data):
     """baseline: SVM (with Kernel)"""
-
     model = models.SVM_nonlinear(data) # returns a model ready to train
     results, best_model = kfold_train_loop(data, model)
-
     return(results, best_model)
 
 
 def boosted_svm_baseline(data):
     """baseline: SVM (without Kernel)"""
-
     model = models.boosted_SVM(data) # returns a model ready to train
     results, best_model = kfold_train_loop(data, model)
-
-    return(results, best_model)
-
-
+    return results, best_model
+    
+def decision_tree(data, adaboost):
+    """
+    Decision tree experiment
+    """
+    model = models.decision_tree(adaboost)
+    results, best_model = kfold_train_loop(data, model)
+    return results, best_model
