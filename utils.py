@@ -3,17 +3,19 @@ helper functions
 """
 
 from sklearn.preprocessing import LabelEncoder
+import csv
 import logging
 import matplotlib.pyplot as plt
 import numpy as np
 import os
 import warnings
 
+LOGGER = logging.getLogger(os.path.basename(__file__))
+
 warnings.filterwarnings("ignore",category=DeprecationWarning)
 '''remove annoying DeprecationWarning from sk-learn script
 '''
 
-CORR_FEATURES = [0, 1, 3, 4, 5, 8, 9, 10, 11]
 CORR_FEATURES = [2, 6, 7]
 
 LOGGER = logging.getLogger(os.path.basename(__file__))
@@ -71,7 +73,6 @@ def load_wine(test_mode=False, valid_pct=0.2, remove_corr_features=True):
     y_valid = y_train[:n_valid]
     y_train = y_train[n_valid:]
 
-    # data is accessed as data['X']['valid']
     data = {
         'X': {'train': X_train, 'valid': X_valid, 'test': X_test},
         'y': {'train': y_train, 'valid': y_valid, 'test': y_test}

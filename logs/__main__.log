@@ -1,0 +1,4 @@
+fold 1/3, 0.00 sec elapsed
+fold 2/3, 328.02 sec elapsed
+fold 3/3, 357.39 sec elapsed
+train/valid accuracy: 0.8070040407927651/0.816923076923077

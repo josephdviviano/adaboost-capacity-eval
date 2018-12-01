@@ -36,6 +36,10 @@ def main(args):
     if args.model == 'decision_tree':
         results, best_model = exp.decision_tree(data, args.adaboost)
         #print(best_model.cv_results_)
+    elif args.model == 'svm':
+        svm_pred, svm_model = exp.boosted_svm_baseline(data)
+        #svm_pred, svm_model = exp.svm_nonlinear(data)
+        
     utils.write_results('results/wine.csv', results)
 
 if __name__ == "__main__":

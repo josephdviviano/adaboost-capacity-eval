@@ -25,6 +25,3 @@ and build from that. They are all set up to work comme ca:`
 + `data.split.py`: split a specify data (CSV) in a train and a test file. (see the docstring for more details)
 **NOTE**: The data is already combined and split so there is no need to run `combine.py` nor `split.py` 
 
-## Data
-- [Wine Quality](https://archive.ics.uci.edu/ml/datasets/wine+quality)
-

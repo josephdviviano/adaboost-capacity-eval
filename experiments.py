@@ -15,7 +15,7 @@ import time
 LOGGER = logging.getLogger(os.path.basename(__file__))
 
 SETTINGS = {
-    'folds': 5,
+    'folds': 3,
 }
 
 
@@ -71,11 +71,23 @@ def kfold_train_loop(data, model):
 
     return results, best_model
 
+def svm_nonlinear(data):
+    """baseline: SVM (with Kernel)"""
+    model = models.SVM_nonlinear(data) # returns a model ready to train
+    results, best_model = kfold_train_loop(data, model)
+    return(results, best_model)
+
+
+def boosted_svm_baseline(data):
+    """baseline: SVM (without Kernel)"""
+    model = models.boosted_SVM(data) # returns a model ready to train
+    results, best_model = kfold_train_loop(data, model)
+    return results, best_model
+    
 def decision_tree(data, adaboost):
     """
     Decision tree experiment
     """
     model = models.decision_tree(adaboost)
     results, best_model = kfold_train_loop(data, model)
-
     return results, best_model
