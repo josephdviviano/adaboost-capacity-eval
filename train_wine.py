@@ -36,7 +36,7 @@ def main(args):
     if args.model == 'decision_tree':
         results, best_model = exp.decision_tree(data, args.adaboost)
         #print(best_model.cv_results_)
-        utils.write_results('results/wine.csv', results)
+    utils.write_results('results/wine.csv', results)
 
 if __name__ == "__main__":
 
