@@ -5,6 +5,10 @@ ift6390-final
 ```
 python train_wine --model decision_tree --adaboost True
 ```
+## SVM experiment
+```
+python train_wine --model svm --adaboost True
+```
 
 If you want to train a subset of the models, feel free to make a copy of `train_wine.py`
 and build from that. They are all set up to work comme ca:`
