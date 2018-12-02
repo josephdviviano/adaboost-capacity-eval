@@ -32,14 +32,8 @@ def main(args):
     data = utils.load_wine(args.test)
 
     if args.model == 'decision_tree':
-<<<<<<< HEAD
         param_pairs = [(6, 1), (5, 2), (4, 4), (3, 8), (2, 16)]#, (5, 32), (4, 64), (3, 128)]
         results = exp.decision_tree(data, param_pairs)
-=======
-        param_pairs = [(10, 1), (8, 20), (6, 30), (4, 40), (2, 50)]
-        results, best_model = exp.decision_tree(data, param_pairs)
-
->>>>>>> f47478eed5a9ee09a67eb1f8b2b1d6f56ba87c96
     elif args.model == 'svm':
         svm_pred, svm_model = exp.svm(data)
 
