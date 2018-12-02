@@ -39,7 +39,9 @@ def main(args):
     elif args.model == 'svm':
         svm_pred, svm_model = exp.boosted_svm_baseline(data)
         #svm_pred, svm_model = exp.svm_nonlinear(data)
-        
+    elif args.model == 'nn':
+        single_pred, boosted_pred, single_model, boosted_model = exp.boosted_nn_baseline(data)
+
     utils.write_results('results/wine.csv', results)
 
 if __name__ == "__main__":
@@ -57,3 +59,4 @@ if __name__ == "__main__":
         LOGGER.setLevel(logging.INFO)
 
     main(args)
+

@@ -71,6 +71,7 @@ def kfold_train_loop(data, model):
 
     return results, best_model
 
+
 def svm_nonlinear(data):
     """baseline: SVM (with Kernel)"""
     model = models.SVM_nonlinear(data) # returns a model ready to train
@@ -78,12 +79,14 @@ def svm_nonlinear(data):
     return(results, best_model)
 
 
+
 def boosted_svm_baseline(data):
     """baseline: SVM (without Kernel)"""
     model = models.boosted_SVM(data) # returns a model ready to train
     results, best_model = kfold_train_loop(data, model)
     return results, best_model
-    
+
+
 def decision_tree(data, adaboost):
     """
     Decision tree experiment
@@ -91,3 +94,17 @@ def decision_tree(data, adaboost):
     model = models.decision_tree(adaboost)
     results, best_model = kfold_train_loop(data, model)
     return results, best_model
+
+
+def boosted_nn_baseline(data):
+    """baseline -- neural network with adaboost"""
+    # get the non-boosted model results
+    model = models.mlp()
+    single_results, single_best_model = kfold_train_loop(data, model)
+
+    # get the boosted model results
+    model = model.mlp_boosted(single_best_model)
+    boosted_results, boosted_best_model = kfold_train_loop(data, model)
+
+    return(single_results, boosted_results, single_best_model, boosted_best_model)
+
