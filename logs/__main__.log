@@ -13,3 +13,34 @@ diff: line_lengths old: 1, new: 1
 diff replace old[1:1] new[1:1]
 parse_part from 1 to 1 (to 0 in part parser)
 diff parser end
+diff parser start
+diff parser calculated
+diff: line_lengths old: 1, new: 1
+diff replace old[1:1] new[1:1]
+parse_part from 1 to 1 (to 0 in part parser)
+diff parser end
+pickle loaded: /opt/python/sci_36/lib/python3.6/site-packages/sklearn/metrics/classification.py
+pickle loaded: /opt/python/sci_36/lib/python3.6/copy.py
+pickle loaded: /opt/python/sci_36/lib/python3.6/site-packages/IPython/core/autocall.py
+pickle loaded: /opt/python/sci_36/lib/python3.6/site-packages/IPython/core/interactiveshell.py
+pickle loaded: /opt/python/sci_36/lib/python3.6/site-packages/IPython/__init__.py
+diff parser start
+diff parser calculated
+diff: line_lengths old: 1, new: 1
+diff replace old[1:1] new[1:1]
+parse_part from 1 to 1 (to 0 in part parser)
+diff parser end
+pickle loaded: /opt/python/sci_36/lib/python3.6/site-packages/numpy/__init__.py
+pickle loaded: /opt/python/sci_36/lib/python3.6/site-packages/sklearn/base.py
+diff parser start
+diff parser calculated
+diff: line_lengths old: 1, new: 1
+diff replace old[1:1] new[1:1]
+parse_part from 1 to 1 (to 0 in part parser)
+diff parser end
+diff parser start
+diff parser calculated
+diff: line_lengths old: 1, new: 1
+diff replace old[1:1] new[1:1]
+parse_part from 1 to 1 (to 0 in part parser)
+diff parser end
