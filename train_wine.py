@@ -36,7 +36,7 @@ def main(args):
         results, best_model = exp.decision_tree(data, param_pairs)
 
     elif args.model == 'svm':
-        svm_pred, svm_model = exp.boosted_svm_baseline(data)
+        svm_pred, svm_model = exp.svm(data)
 
     elif args.model == 'nn':
         single_pred, boosted_pred, single_model, boosted_model = exp.nn(data)

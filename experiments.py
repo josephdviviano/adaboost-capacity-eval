@@ -58,53 +58,42 @@ def kfold_train_loop(data, model):
 
     best_model.fit(data['X']['train'], data['y']['train']) # fit training data
     y_train_pred = best_model.predict(data['X']['train'])  # train scores
-    y_valid_pred = best_model.predict(data['X']['valid'])  # validation scores
     y_test_pred = best_model.predict(data['X']['test'])    # test scores
 
     LOGGER.info('train/valid accuracy: {}/{}'.format(
         accuracy_score(y_train_pred, data['y']['train']),
-        accuracy_score(y_valid_pred, data['y']['valid'])
+        accuracy_score(y_test_pred, data['y']['test'])
     ))
 
     results = {
         'train': accuracy_score(y_train_pred, data['y']['train']),
-        'valid': accuracy_score(y_valid_pred, data['y']['valid']),
-        'test': y_test_pred
+        'test':  accuracy_score(y_test_pred,  data['y']['test']),
     }
 
-    return results, best_model
-
-
-def svm_nonlinear(data):
-    """baseline: SVM (with Kernel)"""
-    model = models.SVM_nonlinear(data) # returns a model ready to train
-    results, best_model = kfold_train_loop(data, model)
     return(results, best_model)
 
 
-
-def boosted_svm_baseline(data):
-    """baseline: SVM (without Kernel)"""
-    model = models.boosted_SVM(data) # returns a model ready to train
+def svm(data):
+    """linear svm with and without adaboost"""
+    model = models.boosted_SVM(data)
     results, best_model = kfold_train_loop(data, model)
-    return results, best_model
+
+    return(results, best_model)
 
 
 def decision_tree(data, param_pairs):
-    """
-    Decision tree experiment
-    """
-    storage = {'train_acc': [], 'valid_acc': []}
+    """decision trees with and without adaboost"""
+    storage = {'train_acc': [], 'test_acc': []}
     for max_depth, n_learners in param_pairs:
         model = models.decision_tree(adaboost=True, max_depth=max_depth, n_learners=n_learners)
         results, best_model = kfold_train_loop(data, model)
         storage['train_acc'].append(results['train'])
-        storage['valid_acc'].append(results['valid'])
+        storage['test_acc'].append(results['test'])
 
     utils.plot_decision_tree_result(
-        storage['train_acc'], storage['valid_acc'], param_pairs)
+        storage['train_acc'], storage['test_acc'], param_pairs)
 
-    return results, best_model
+    return(results, best_model)
 
 
 def nn(data):
@@ -119,4 +108,5 @@ def nn(data):
     boosted_results, boosted_best_model = kfold_train_loop(data, model)
 
     return(single_results, boosted_results, single_best_model, boosted_best_model)
+
 

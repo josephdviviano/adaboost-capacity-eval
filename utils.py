@@ -10,11 +10,9 @@ import os
 import warnings
 
 warnings.filterwarnings("ignore",category=DeprecationWarning)
-'''remove annoying DeprecationWarning from sklearn script
-'''
+'''remove annoying DeprecationWarning from sklearn script'''
 
 CORR_FEATURES = [2, 6, 7]
-
 LOGGER = logging.getLogger(os.path.basename(__file__))
 
 def write_results(y_pred, y_true):
@@ -23,14 +21,15 @@ def write_results(y_pred, y_true):
     """
     pass
 
+
 def _relabel_wine(targets, num_classes=5):
     """
     Reduce the number of label by merging
-    some classes together. 
-    
-    NOTE: The number of classes for the 
-    wine dataset is 7, but theres is too 
-    few examples for class 3 and 9. It 
+    some classes together.
+
+    NOTE: The number of classes for the
+    wine dataset is 7, but theres is too
+    few examples for class 3 and 9. It
     Creates bugs when k-folding
     """
     if num_classes == 'all':
@@ -44,9 +43,10 @@ def _relabel_wine(targets, num_classes=5):
         targets[targets in [7., 8., 9.]] = 3.
     else:
         raise ValueError('Valid value for num_classes are: 5, 7')
-    return targets
+    return(targets)
 
-def load_wine(test_mode=False, valid_pct=0.2, remove_corr_features=True):
+
+def load_wine(test_mode=False, remove_corr_features=False):
     """
     loads the data into a structure for SCIKIT LEARN. data is stored as
     (n_subjects x n_features).
@@ -54,7 +54,7 @@ def load_wine(test_mode=False, valid_pct=0.2, remove_corr_features=True):
     #load data
     data_train = np.genfromtxt('data/wine/train.csv', delimiter=',', skip_header=1)
     data_test = np.genfromtxt('data/wine/test.csv', delimiter=',', skip_header=1)
-    
+
     #split into X and y
     X_train = data_train[:, :-1]
     X_test  = data_test[:, :-1]
@@ -63,7 +63,7 @@ def load_wine(test_mode=False, valid_pct=0.2, remove_corr_features=True):
 
     if remove_corr_features:
         all_features = list(range(X_train.shape[1]+1))
-        keep_features = [x for x in all_features if x not in CORR_FEATURES] 
+        keep_features = [x for x in all_features if x not in CORR_FEATURES]
         X_train = data_train[:, keep_features]
         X_test  = data_test[:, keep_features]
 
@@ -74,24 +74,17 @@ def load_wine(test_mode=False, valid_pct=0.2, remove_corr_features=True):
     else:
         n_samples = len(X_train)
 
-    # make validation set
-    n_valid = int(np.floor(valid_pct * n_samples))
-
-    X_valid = X_train[:n_valid, :]
-    X_train = X_train[n_valid:, :]
-    y_valid = y_train[:n_valid]
-    y_train = y_train[n_valid:]
-
-    # data is accessed as data['X']['valid']
+    # data is accessed as data['X']['test']
     data = {
-        'X': {'train': X_train, 'valid': X_valid, 'test': X_test},
-        'y': {'train': y_train, 'valid': y_valid, 'test': y_test}
+        'X': {'train': X_train, 'test': X_test},
+        'y': {'train': y_train, 'test': y_test}
     }
 
-    LOGGER.debug('n TRAIN = {}, n VALID = {}, n TEST = {}'.format(
+    LOGGER.debug('n TRAIN = {}, n TEST = {}'.format(
         X_train.shape[0], X_valid.shape[0], X_test.shape[0]))
 
-    return data
+    return(data)
+
 
 def plot_decision_tree_result(train_acc, valid_acc, params_pairs):
     params_pairs = [str(param) for param in params_pairs]
@@ -103,6 +96,7 @@ def plot_decision_tree_result(train_acc, valid_acc, params_pairs):
     plt.ylabel('gradient')
     plt.savefig('./figures/decision_tree.png')
     plt.show()
+
 
 def load_covertype(test_mode=False, valid_pct=0.1):
     pass
