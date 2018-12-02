@@ -1,2 +1,4 @@
+running in test mode, n=500
 n TRAIN = 5522, n TEST = 975
-train/valid accuracy: 0.5537848605577689/0.556923076923077
+train/valid accuracy: 0.5593987685621151/0.5476923076923077
+train/valid accuracy: 0.5559579862368706/0.5682051282051283

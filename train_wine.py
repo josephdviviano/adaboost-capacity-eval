@@ -39,15 +39,12 @@ def main(args):
     elif args.model == 'svm':
         svm_pred, svm_model = exp.svm(data)
 
-    elif args.model == 'nn':
-        single_pred, boosted_pred, single_model, boosted_model = exp.nn(data)
+    elif args.model == 'mlp':
+        single_pred, boosted_pred, single_model, boosted_model = exp.mlp(data)
 
     else:
-        LOGGER.warning('invalid experiment submitted -m {decision_tree, svm, nn}')
+        LOGGER.warning('invalid experiment submitted -m {decision_tree, svm, mlp}')
         sys.exit(1)
-
-
-    utils.write_results('results/wine.csv', results)
 
 
 if __name__ == "__main__":

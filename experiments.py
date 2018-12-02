@@ -59,8 +59,8 @@ def decision_tree(data, param_pairs):
     return(results, best_model)
 
 
-def nn(data):
-    """neural network with and without adaboost"""
+def mlp(data):
+    """mlp with and without adaboost"""
     # get the non-boosted model results
     model = models.mlp()
     single_results, single_best_model = kfold_train_loop(data, model)
