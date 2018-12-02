@@ -1,46 +1,6 @@
-n TRAIN = 4418, n VALID = 1104, n TEST = 975
-fold 1/5, 0.00 sec elapsed
-fold 2/5, 16.52 sec elapsed
-fold 3/5, 14.30 sec elapsed
-fold 4/5, 16.04 sec elapsed
-fold 5/5, 13.57 sec elapsed
-train/valid accuracy: 0.9880036215482119/0.9846014492753623
-pickle loaded: /opt/python/sci_36/lib/python3.6/site-packages/sklearn/model_selection/_search.py
-pickle loaded: /opt/python/sci_36/lib/python3.6/site-packages/sklearn/pipeline.py
-diff parser start
-diff parser calculated
-diff: line_lengths old: 1, new: 1
-diff replace old[1:1] new[1:1]
-parse_part from 1 to 1 (to 0 in part parser)
-diff parser end
-diff parser start
-diff parser calculated
-diff: line_lengths old: 1, new: 1
-diff replace old[1:1] new[1:1]
-parse_part from 1 to 1 (to 0 in part parser)
-diff parser end
-pickle loaded: /opt/python/sci_36/lib/python3.6/site-packages/sklearn/metrics/classification.py
-pickle loaded: /opt/python/sci_36/lib/python3.6/copy.py
-pickle loaded: /opt/python/sci_36/lib/python3.6/site-packages/IPython/core/autocall.py
-pickle loaded: /opt/python/sci_36/lib/python3.6/site-packages/IPython/core/interactiveshell.py
-pickle loaded: /opt/python/sci_36/lib/python3.6/site-packages/IPython/__init__.py
-diff parser start
-diff parser calculated
-diff: line_lengths old: 1, new: 1
-diff replace old[1:1] new[1:1]
-parse_part from 1 to 1 (to 0 in part parser)
-diff parser end
-pickle loaded: /opt/python/sci_36/lib/python3.6/site-packages/numpy/__init__.py
-pickle loaded: /opt/python/sci_36/lib/python3.6/site-packages/sklearn/base.py
-diff parser start
-diff parser calculated
-diff: line_lengths old: 1, new: 1
-diff replace old[1:1] new[1:1]
-parse_part from 1 to 1 (to 0 in part parser)
-diff parser end
-diff parser start
-diff parser calculated
-diff: line_lengths old: 1, new: 1
-diff replace old[1:1] new[1:1]
-parse_part from 1 to 1 (to 0 in part parser)
-diff parser end
+train/valid accuracy: 0.6119159724737414/0.5497435897435897
+train/valid accuracy: 0.5822165881926838/0.5343589743589744
+train/valid accuracy: 0.5559579862368706/0.5487179487179488
+train/valid accuracy: 0.5494386091995653/0.5446153846153846
+train/valid accuracy: 0.5369431365447301/0.5241025641025641
+train/valid accuracy: 0.5363998551249547/0.5538461538461539
