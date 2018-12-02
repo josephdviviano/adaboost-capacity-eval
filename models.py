@@ -25,7 +25,7 @@ LOGGER = logging.getLogger(os.path.basename(__file__))
 SETTINGS = {
     'n_cv': 50,
     'n_inner': 3,
-    'pca_range': stats.randint(2, 9)
+    'pca_range': stats.randint(4, 8)
 }
 
 # controls how chatty RandomizedCV is
@@ -139,16 +139,16 @@ def _tree():
 
     return model
 
-def _forest(adaboost=True):
+def _forest(max_depth, n_learners):
 
     settings = {
         'dim__n_components': SETTINGS['pca_range'],
-        'clf__n_estimators': stats.randint(25, 50),
-        'clf__learning_rate': stats.uniform(0.1, 2.)
+        #'clf__learning_rate': stats.uniform(0.5, 1.5)
     }
 
-    clf = AdaBoostClassifier(DecisionTreeClassifier(
-        criterion='entropy', max_depth=8, max_features='auto'))
+    clf = AdaBoostClassifier(
+        DecisionTreeClassifier(criterion='entropy', max_depth=max_depth, max_features='auto'),
+        n_estimators=n_learners)
 
     pipeline = Pipeline([
         ('pre', StandardScaler()),
@@ -162,13 +162,13 @@ def _forest(adaboost=True):
 
     return model
 
-def decision_tree(adaboost=True):
+def decision_tree(adaboost, max_depth=None, n_learners=1):
     """
-    Build decision tree model
+    Build decision tree model.
     """
     LOGGER.info('Building decision tree model with adaboost set to: {}'.format(adaboost))
     if adaboost:
-        model = _forest()
+        model = _forest(max_depth, n_learners)
     else:
         model = _tree()
     return model
@@ -215,7 +215,7 @@ def mlp_boosted(model):
         'clf__learning_rate': [10e-1, 10e-2, 10e-3, 10e-4, 10e-5]
     }
 
-    estimator = model.best_estimator_.named_steps['clf'])
+    estimator = model.best_estimator_.named_steps['clf']
     estimator.hidden_layer_sizes = 10
     clf = AdaBoostClassifier(
         base_estimator=estimator, n_estimators=10, algorithm='SAMME'
@@ -227,7 +227,7 @@ def mlp_boosted(model):
         ('clf', clf),
     ])
 
-    model = RandomizedSearchCV(pipeline, single_settings,
+    model = RandomizedSearchCV(pipeline, settings,
         n_jobs=-1, verbose=VERB_LEVEL, n_iter=SETTINGS['n_cv'],
         cv=SETTINGS['n_inner'], scoring='accuracy'
     )

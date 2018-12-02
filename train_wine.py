@@ -34,8 +34,8 @@ def main(args):
     # run experiments
     # TODO: add other models
     if args.model == 'decision_tree':
-        results, best_model = exp.decision_tree(data, args.adaboost)
-        #print(best_model.cv_results_)
+        param_pairs = [(10, 1), (8, 20), (6, 30), (4, 40), (2, 50)]
+        results, best_model = exp.decision_tree(data, param_pairs)
     elif args.model == 'svm':
         svm_pred, svm_model = exp.boosted_svm_baseline(data)
         #svm_pred, svm_model = exp.svm_nonlinear(data)
@@ -50,7 +50,7 @@ if __name__ == "__main__":
     argparser.add_argument("-v", "--verbose", action="store_true", help="increase output verbosity")
     argparser.add_argument("-t", "--test", action="store_true", help="training set size=500")
     argparser.add_argument("-m", "--model", help="which model?")
-    argparser.add_argument("-ada", "--adaboost", help="Should adaboost be used?")
+    argparser.add_argument("-ada", "--adaboost", type=bool, default=False, help="Should adaboost be used?")
     args = argparser.parse_args()
 
     if args.verbose:

@@ -23,27 +23,27 @@ def write_results(y_pred, y_true):
     """
     pass
 
-def _relabel_wine(targets, num_features=5):
+def _relabel_wine(targets, num_classes=5):
     """
     Reduce the number of label by merging
     some classes together. 
     
-    NOTE: The number of features for the 
+    NOTE: The number of classes for the 
     wine dataset is 7, but theres is too 
     few examples for class 3 and 9. It 
     Creates bugs when k-folding
     """
-    if num_features == 'all':
+    if num_classes == 'all':
         pass
-    elif num_features == 5:
+    elif num_classes == 5:
         targets[targets==3.] = 4.
         targets[targets==9.] = 8.
-    elif num_features == 3:
+    elif num_classes == 3:
         targets[targets in [1., 2., 3.]] = 1.
         targets[targets in [4., 5., 6.]] = 2.
         targets[targets in [7., 8., 9.]] = 3.
     else:
-        raise ValueError('Valid value for num_features are: 5, 7')
+        raise ValueError('Valid value for num_classes are: 5, 7')
     return targets
 
 def load_wine(test_mode=False, valid_pct=0.2, remove_corr_features=True):
@@ -92,6 +92,17 @@ def load_wine(test_mode=False, valid_pct=0.2, remove_corr_features=True):
         X_train.shape[0], X_valid.shape[0], X_test.shape[0]))
 
     return data
+
+def plot_decision_tree_result(train_acc, valid_acc, params_pairs):
+    params_pairs = [str(param) for param in params_pairs]
+    plt.rcParams.update({'font.size': 6})
+    plt.plot(params_pairs, train_acc)
+    plt.plot(params_pairs, valid_acc)
+    plt.legend(['train accuracy', 'validation accuracy'])
+    plt.xlabel('parameter pairs')
+    plt.ylabel('gradient')
+    plt.savefig('./figures/decision_tree.png')
+    plt.show()
 
 def load_covertype(test_mode=False, valid_pct=0.1):
     pass

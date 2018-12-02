@@ -11,6 +11,7 @@ import models
 import numpy as np
 import os
 import time
+import utils
 
 LOGGER = logging.getLogger(os.path.basename(__file__))
 
@@ -66,7 +67,9 @@ def kfold_train_loop(data, model):
     ))
 
     results = {
-        'train': y_train_pred, 'valid': y_valid_pred, 'test': y_test_pred
+        'train': accuracy_score(y_train_pred, data['y']['train']), 
+        'valid': accuracy_score(y_valid_pred, data['y']['valid']), 
+        'test': y_test_pred
     }
 
     return results, best_model
@@ -87,12 +90,20 @@ def boosted_svm_baseline(data):
     return results, best_model
 
 
-def decision_tree(data, adaboost):
+def decision_tree(data, param_pairs):
     """
     Decision tree experiment
     """
-    model = models.decision_tree(adaboost)
-    results, best_model = kfold_train_loop(data, model)
+    storage = {'train_acc': [], 'valid_acc': []}
+    for max_depth, n_learners in param_pairs:
+        model = models.decision_tree(adaboost=True, max_depth=max_depth, n_learners=n_learners)
+        results, best_model = kfold_train_loop(data, model)
+        storage['train_acc'].append(results['train'])
+        storage['valid_acc'].append(results['valid'])
+
+    utils.plot_decision_tree_result(
+        storage['train_acc'], storage['valid_acc'], param_pairs)
+
     return results, best_model
 
 
