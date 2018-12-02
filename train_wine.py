@@ -6,13 +6,13 @@ imports a set of experiments from experiments.py, runs them, and write results
 import matplotlib
 matplotlib.use('agg')
 
-import utils
 import argparse
 import experiments as exp
 import logging
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import utils
 
 # adds a simple logger
 logging.basicConfig(level=logging.INFO, format="[%(name)s:%(funcName)s:%(lineno)s] %(levelname)s: %(message)s")
@@ -43,6 +43,7 @@ def main(args):
 
     utils.write_results('results/wine.csv', results)
 
+
 if __name__ == "__main__":
 
     argparser = argparse.ArgumentParser()
@@ -58,4 +59,5 @@ if __name__ == "__main__":
         LOGGER.setLevel(logging.INFO)
 
     main(args)
+
 
