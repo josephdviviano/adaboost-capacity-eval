@@ -46,7 +46,7 @@ def _relabel_wine(targets, num_classes=5):
         raise ValueError('Valid value for num_classes are: 5, 7')
     return targets
 
-def load_wine(test_mode=False, valid_pct=0.2, remove_corr_features=True):
+def load_wine(test_mode=False, valid_pct=0.2, remove_corr_features=False):
     """
     loads the data into a structure for SCIKIT LEARN. data is stored as
     (n_subjects x n_features).
@@ -59,7 +59,7 @@ def load_wine(test_mode=False, valid_pct=0.2, remove_corr_features=True):
     X_train = data_train[:, :-1]
     X_test  = data_test[:, :-1]
     y_train = _relabel_wine(data_train[:, -1])
-    y_test  = _relabel_wine(data_train[:, -1])
+    y_test  = _relabel_wine(data_test[:, -1])
 
     if remove_corr_features:
         all_features = list(range(X_train.shape[1]+1))
@@ -74,31 +74,23 @@ def load_wine(test_mode=False, valid_pct=0.2, remove_corr_features=True):
     else:
         n_samples = len(X_train)
 
-    # make validation set
-    n_valid = int(np.floor(valid_pct * n_samples))
-
-    X_valid = X_train[:n_valid, :]
-    X_train = X_train[n_valid:, :]
-    y_valid = y_train[:n_valid]
-    y_train = y_train[n_valid:]
-
     # data is accessed as data['X']['valid']
     data = {
-        'X': {'train': X_train, 'valid': X_valid, 'test': X_test},
-        'y': {'train': y_train, 'valid': y_valid, 'test': y_test}
+        'X': {'train': X_train, 'test': X_test},
+        'y': {'train': y_train, 'test': y_test}
     }
 
-    LOGGER.debug('n TRAIN = {}, n VALID = {}, n TEST = {}'.format(
-        X_train.shape[0], X_valid.shape[0], X_test.shape[0]))
+    LOGGER.debug('n TRAIN = {}, n TEST = {}'.format(
+        X_train.shape[0], X_test.shape[0]))
 
     return data
 
-def plot_decision_tree_result(train_acc, valid_acc, params_pairs):
+def plot_decision_tree_result(train_acc, test_acc, params_pairs):
     params_pairs = [str(param) for param in params_pairs]
     plt.rcParams.update({'font.size': 6})
     plt.plot(params_pairs, train_acc)
-    plt.plot(params_pairs, valid_acc)
-    plt.legend(['train accuracy', 'validation accuracy'])
+    plt.plot(params_pairs, test_acc)
+    plt.legend(['train accuracy', 'test accuracy'])
     plt.xlabel('parameter pairs')
     plt.ylabel('gradient')
     plt.savefig('./figures/decision_tree.png')

@@ -23,9 +23,8 @@ LOGGER = logging.getLogger(os.path.basename(__file__))
 
 # global settings for all cross-validation runs
 SETTINGS = {
-    'n_cv': 50,
-    'n_inner': 3,
-    'pca_range': stats.randint(4, 8)
+    'n_cv': 25,
+    'n_inner': 3
 }
 
 # controls how chatty RandomizedCV is
@@ -58,35 +57,6 @@ def SVM(data):
 
     return model
 
-
-def SVM_nonlinear(data):
-    """soft SVM with kernel"""
-    LOGGER.debug('building SVM model')
-    # hyperparameters to search for randomized cross validation
-    settings = {
-        'dim__n_components': SETTINGS['pca_range'],
-        'clf__tol': stats.uniform(10e-5, 10e-1),
-        'clf__C': stats.uniform(10e-3, 1)
-    }
-
-    # model we will train in our pipeline
-    clf = SVC(gamma=0.001, max_iter=-1)
-
-    # pipeline runs preprocessing and model during every CV loop
-    pipe = Pipeline([
-        ('pre', StandardScaler()),
-        ('dim', PCA(svd_solver='randomized')),
-        ('clf', clf),
-    ])
-
-    # this will learn our best parameters for the final
-    model = RandomizedSearchCV(pipe, settings, n_jobs=-1, verbose=VERB_LEVEL,
-        n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_inner'], scoring='accuracy'
-    )
-
-    return model
-
-
 def boosted_SVM(data):
     """ baseline: linear classifier (without kernel)"""
     LOGGER.debug('building SVM model')
@@ -117,42 +87,38 @@ def boosted_SVM(data):
 
     return model
 
-def _tree():
+def decision_tree():
     settings = {
-        'dim__n_components': SETTINGS['pca_range'],
-        'clf__max_depth': stats.randint(1, 12),
-        'clf__min_samples_split': stats.randint(2, 5),
-        'clf__min_samples_leaf': stats.randint(1, 5),
-        'clf__max_features': stats.randint(1, 5)
+        'clf__max_depth': stats.randint(2, 9),
+        #'clf__min_samples_split': stats.randint(2, 5),
+        #'clf__min_samples_leaf': stats.randint(1, 10),
+        #'clf__max_features': stats.randint(2, )
     }
 
     clf = DecisionTreeClassifier(criterion='entropy')
 
     pipeline = Pipeline([
         ('pre', StandardScaler()),
-        ('dim', PCA(svd_solver='randomized')),
         ('clf', clf),
     ])
 
     model = RandomizedSearchCV(pipeline, settings, n_jobs=-1, verbose=VERB_LEVEL,
-        n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_inner'], scoring='accuracy')
+        n_iter=100, cv=SETTINGS['n_inner'], scoring='accuracy')
 
     return model
 
-def _forest(max_depth, n_learners):
+def random_forest(base_model, max_depth, n_learners):
 
     settings = {
-        'dim__n_components': SETTINGS['pca_range'],
-        #'clf__learning_rate': stats.uniform(0.5, 1.5)
+        'clf__learning_rate': stats.uniform(0.5, 1.5)
     }
 
-    clf = AdaBoostClassifier(
-        DecisionTreeClassifier(criterion='entropy', max_depth=max_depth, max_features='auto'),
-        n_estimators=n_learners)
+    base_model.max_depth = max_depth
+
+    clf = AdaBoostClassifier(base_estimator=base_model, n_estimators=n_learners)
 
     pipeline = Pipeline([
         ('pre', StandardScaler()),
-        ('dim', PCA(svd_solver='randomized')),
         ('clf', clf),
     ])
 
@@ -161,18 +127,6 @@ def _forest(max_depth, n_learners):
     )
 
     return model
-
-def decision_tree(adaboost, max_depth=None, n_learners=1):
-    """
-    Build decision tree model.
-    """
-    LOGGER.info('Building decision tree model with adaboost set to: {}'.format(adaboost))
-    if adaboost:
-        model = _forest(max_depth, n_learners)
-    else:
-        model = _tree()
-    return model
-
 
 def mlp(n_hid=100):
     """build a not-boosted MLP classifier"""
