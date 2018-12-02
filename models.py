@@ -215,6 +215,7 @@ def mlp_boosted(model):
         'clf__learning_rate': [10e-1, 10e-2, 10e-3, 10e-4, 10e-5]
     }
 
+    # TODO: I NEED TO CHANGE THE HIDDEN LAYER SIZE TO 10 FOR THIS MODEL
     clf = AdaBoostClassifier(
         base_estimator=model.best_estimator_.named_steps['clf']),
         n_estimators=10, algorithm='SAMME'
