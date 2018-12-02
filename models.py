@@ -88,12 +88,9 @@ def boosted_SVM():
     return(model)
 
 
-def _tree():
+def decision_tree():
     settings = {
-        'clf__max_depth': stats.randint(1, 12),
-        'clf__min_samples_split': stats.randint(2, 5),
-        'clf__min_samples_leaf': stats.randint(1, 5),
-        'clf__max_features': stats.randint(1, 5)
+        'clf__max_depth': stats.randint(2, 9)
     }
 
     clf = DecisionTreeClassifier(criterion='entropy')
@@ -104,20 +101,20 @@ def _tree():
     ])
 
     model = RandomizedSearchCV(pipeline, settings, n_jobs=-1, verbose=VERB_LEVEL,
-        n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_folds'], scoring='accuracy')
+        n_iter=100, cv=SETTINGS['n_inner'], scoring='accuracy')
 
-    return(model)
+    return model
 
 
-def _forest(max_depth, n_learners):
+def random_forest(base_model, max_depth, n_learners):
 
     settings = {
-        'clf__learning_rate': SETTINGS['ada_lr']
+        'clf__learning_rate': stats.uniform(0.5, 1.5)
     }
 
-    clf = AdaBoostClassifier(
-        DecisionTreeClassifier(criterion='entropy', max_depth=max_depth, max_features='auto'),
-        n_estimators=n_learners)
+    base_model.max_depth = max_depth
+
+    clf = AdaBoostClassifier(base_estimator=base_model, n_estimators=n_learners)
 
     pipeline = Pipeline([
         ('pre', StandardScaler()),
@@ -129,18 +126,6 @@ def _forest(max_depth, n_learners):
     )
 
     return(model)
-
-
-def decision_tree(adaboost, max_depth=None, n_learners=1):
-    """
-    Build decision tree model.
-    """
-    LOGGER.info('Building decision tree model with adaboost set to: {}'.format(adaboost))
-    if adaboost:
-        model = _forest(max_depth, n_learners)
-    else:
-        model = _tree()
-    return model
 
 
 def mlp(n_hid=100):
