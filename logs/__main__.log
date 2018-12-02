@@ -1,4 +1,15 @@
-fold 1/3, 0.00 sec elapsed
-fold 2/3, 328.02 sec elapsed
-fold 3/3, 357.39 sec elapsed
-train/valid accuracy: 0.8070040407927651/0.816923076923077
+n TRAIN = 4418, n VALID = 1104, n TEST = 975
+fold 1/5, 0.00 sec elapsed
+fold 2/5, 16.52 sec elapsed
+fold 3/5, 14.30 sec elapsed
+fold 4/5, 16.04 sec elapsed
+fold 5/5, 13.57 sec elapsed
+train/valid accuracy: 0.9880036215482119/0.9846014492753623
+pickle loaded: /opt/python/sci_36/lib/python3.6/site-packages/sklearn/model_selection/_search.py
+pickle loaded: /opt/python/sci_36/lib/python3.6/site-packages/sklearn/pipeline.py
+diff parser start
+diff parser calculated
+diff: line_lengths old: 1, new: 1
+diff replace old[1:1] new[1:1]
+parse_part from 1 to 1 (to 0 in part parser)
+diff parser end
