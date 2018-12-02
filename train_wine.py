@@ -31,16 +31,15 @@ def main(args):
 
     data = utils.load_wine(args.test)
 
-    # run experiments
-    # TODO: add other models
     if args.model == 'decision_tree':
         param_pairs = [(10, 1), (8, 20), (6, 30), (4, 40), (2, 50)]
         results, best_model = exp.decision_tree(data, param_pairs)
+
     elif args.model == 'svm':
         svm_pred, svm_model = exp.boosted_svm_baseline(data)
-        #svm_pred, svm_model = exp.svm_nonlinear(data)
+
     elif args.model == 'nn':
-        single_pred, boosted_pred, single_model, boosted_model = exp.boosted_nn_baseline(data)
+        single_pred, boosted_pred, single_model, boosted_model = exp.nn(data)
 
     utils.write_results('results/wine.csv', results)
 

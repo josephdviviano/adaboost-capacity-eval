@@ -67,8 +67,8 @@ def kfold_train_loop(data, model):
     ))
 
     results = {
-        'train': accuracy_score(y_train_pred, data['y']['train']), 
-        'valid': accuracy_score(y_valid_pred, data['y']['valid']), 
+        'train': accuracy_score(y_train_pred, data['y']['train']),
+        'valid': accuracy_score(y_valid_pred, data['y']['valid']),
         'test': y_test_pred
     }
 
@@ -107,13 +107,14 @@ def decision_tree(data, param_pairs):
     return results, best_model
 
 
-def boosted_nn_baseline(data):
-    """baseline -- neural network with adaboost"""
+def nn(data):
+    """neural network with and without adaboost"""
     # get the non-boosted model results
     model = models.mlp()
     single_results, single_best_model = kfold_train_loop(data, model)
 
-    # get the boosted model results
+    # get the boosted model results using the hyperparameters learned on a
+    # single model
     model = model.mlp_boosted(single_best_model)
     boosted_results, boosted_best_model = kfold_train_loop(data, model)
 

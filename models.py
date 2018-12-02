@@ -2,21 +2,19 @@
 holds our models (e.g., imagenet, cnns, etc, to be imported into experiments.py)
 """
 from scipy import stats
-from sklearn.decomposition import PCA
+from sklearn.ensemble import AdaBoostClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
-from sklearn.ensemble import AdaBoostClassifier
+from sklearn.tree import DecisionTreeClassifier
 import argparse
 import logging
 import numpy as np
 import os
-from sklearn.ensemble import AdaBoostClassifier
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.neural_network import MLPClassifier
 
 
 LOGGER = logging.getLogger(os.path.basename(__file__))
@@ -25,18 +23,18 @@ LOGGER = logging.getLogger(os.path.basename(__file__))
 SETTINGS = {
     'n_cv': 50,
     'n_inner': 3,
-    'pca_range': stats.randint(4, 8)
+    'ada_lr': [10e-1, 10e-2, 10e-3, 10e-4, 10e-5]
 }
 
 # controls how chatty RandomizedCV is
 VERB_LEVEL = 0
 
-def SVM(data):
+def SVM():
     """ baseline: linear classifier (without kernel)"""
     LOGGER.debug('building SVM model')
+
     # hyperparameters to search for randomized cross validation
     settings = {
-        'dim__n_components': SETTINGS['pca_range'],
         'clf__tol': stats.uniform(10e-5, 10e-1),
         'clf__C': stats.uniform(10e-3, 1)
     }
@@ -47,7 +45,6 @@ def SVM(data):
     # pipeline runs preprocessing and model during every CV loop
     pipe = Pipeline([
         ('pre', StandardScaler()),
-        ('dim', PCA(svd_solver='randomized')),
         ('clf', clf),
     ])
 
@@ -56,57 +53,28 @@ def SVM(data):
         n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_inner'], scoring='accuracy'
     )
 
-    return model
+    return(model)
 
 
-def SVM_nonlinear(data):
-    """soft SVM with kernel"""
-    LOGGER.debug('building SVM model')
-    # hyperparameters to search for randomized cross validation
-    settings = {
-        'dim__n_components': SETTINGS['pca_range'],
-        'clf__tol': stats.uniform(10e-5, 10e-1),
-        'clf__C': stats.uniform(10e-3, 1)
-    }
-
-    # model we will train in our pipeline
-    clf = SVC(gamma=0.001, max_iter=-1)
-
-    # pipeline runs preprocessing and model during every CV loop
-    pipe = Pipeline([
-        ('pre', StandardScaler()),
-        ('dim', PCA(svd_solver='randomized')),
-        ('clf', clf),
-    ])
-
-    # this will learn our best parameters for the final
-    model = RandomizedSearchCV(pipe, settings, n_jobs=-1, verbose=VERB_LEVEL,
-        n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_inner'], scoring='accuracy'
-    )
-
-    return model
-
-
-def boosted_SVM(data):
+def boosted_SVM():
     """ baseline: linear classifier (without kernel)"""
-    LOGGER.debug('building SVM model')
+    LOGGER.debug('building boosted SVM model')
+
     # hyperparameters to search for randomized cross validation
     settings = {
-        'dim__n_components': SETTINGS['pca_range'],
         'clf__n_estimators': [25,30,35,40,45,50],
-        'clf__learning_rate': [0.01,0.02,0.04,0.08,0.16,0.32,0.64,1.28,2.56]
+        'clf__learning_rate': SETTINGS['ada_lr']
     }
 
     # model we will train in our pipeline
     #clf = SVC(kernel='linear', max_iter=-1  )
     #clf = AdaBoostClassifier(SVC(C=stats.uniform(10e-3, 1), tol=stats.uniform(10e-5, 10e-1),probability=True, kernel='linear' ))
-    clf = AdaBoostClassifier(SVC(C=0.01, tol=0.001,probability=True, kernel='linear' ))
+    clf = AdaBoostClassifier(SVC(C=0.01, tol=0.001, probability=True, kernel='linear'))
 
 
     # pipeline runs preprocessing and model during every CV loop
     pipe = Pipeline([
         ('pre', StandardScaler()),
-        ('dim', PCA(svd_solver='randomized')),
         ('clf', clf),
     ])
 
@@ -115,11 +83,11 @@ def boosted_SVM(data):
         n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_inner'], scoring='accuracy'
     )
 
-    return model
+    return(model)
+
 
 def _tree():
     settings = {
-        'dim__n_components': SETTINGS['pca_range'],
         'clf__max_depth': stats.randint(1, 12),
         'clf__min_samples_split': stats.randint(2, 5),
         'clf__min_samples_leaf': stats.randint(1, 5),
@@ -130,20 +98,19 @@ def _tree():
 
     pipeline = Pipeline([
         ('pre', StandardScaler()),
-        ('dim', PCA(svd_solver='randomized')),
         ('clf', clf),
     ])
 
     model = RandomizedSearchCV(pipeline, settings, n_jobs=-1, verbose=VERB_LEVEL,
         n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_inner'], scoring='accuracy')
 
-    return model
+    return(model)
+
 
 def _forest(max_depth, n_learners):
 
     settings = {
-        'dim__n_components': SETTINGS['pca_range'],
-        #'clf__learning_rate': stats.uniform(0.5, 1.5)
+        'clf__learning_rate': SETTINGS['ada_lr']
     }
 
     clf = AdaBoostClassifier(
@@ -152,7 +119,6 @@ def _forest(max_depth, n_learners):
 
     pipeline = Pipeline([
         ('pre', StandardScaler()),
-        ('dim', PCA(svd_solver='randomized')),
         ('clf', clf),
     ])
 
@@ -160,7 +126,8 @@ def _forest(max_depth, n_learners):
         n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_inner'], scoring='accuracy'
     )
 
-    return model
+    return(model)
+
 
 def decision_tree(adaboost, max_depth=None, n_learners=1):
     """
@@ -180,10 +147,8 @@ def mlp(n_hid=100):
     # nb: 10 boosters with hid = 10 has 220*10 parameters
     # vs: 1 model with hid = 100 has 10*100 + 100*10 + 100 + 10 = 2110 params
 
-
     # alpha = l2 regularization
-    single_settings = {
-        'dim__n_components': SETTINGS['pca_range'],
+    settings = {
         'clf__alpha': [10e-2, 10e-3, 10e-4, 10e-5, 10e-6, 10e-7, 10e-8],
         'clf__learning_rate_init': [10e-2, 10e-3, 10e-4, 10e-5, 10e-6]
     }
@@ -196,11 +161,10 @@ def mlp(n_hid=100):
 
     pipeline = Pipeline([
         ('pre', StandardScaler()),
-        ('dim', PCA(svd_solver='randomized')),
         ('clf', clf),
     ])
 
-    model = RandomizedSearchCV(pipeline, single_settings,
+    model = RandomizedSearchCV(pipeline, settings,
         n_jobs=-1, verbose=VERB_LEVEL, n_iter=SETTINGS['n_cv'],
         cv=SETTINGS['n_inner'], scoring='accuracy'
     )
@@ -208,13 +172,13 @@ def mlp(n_hid=100):
     return(model)
 
 
-def mlp_boosted(model):
+def boosted_mlp(model):
     """uses model learned by mlp_single for the model settings"""
     settings = {
-        'dim__n_components': SETTINGS['pca_range'],
-        'clf__learning_rate': [10e-1, 10e-2, 10e-3, 10e-4, 10e-5]
+        'clf__learning_rate': SETTINGS['ada_lr']
     }
 
+    # now set hidden layer size to 10
     estimator = model.best_estimator_.named_steps['clf']
     estimator.hidden_layer_sizes = 10
     clf = AdaBoostClassifier(
@@ -223,7 +187,6 @@ def mlp_boosted(model):
 
     pipeline = Pipeline([
         ('pre', StandardScaler()),
-        ('dim', PCA(svd_solver='randomized')),
         ('clf', clf),
     ])
 
