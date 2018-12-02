@@ -45,12 +45,8 @@ def _relabel_wine(targets, num_classes=5):
         raise ValueError('Valid value for num_classes are: 5, 7')
     return(targets)
 
-<<<<<<< HEAD
-def load_wine(test_mode=False, valid_pct=0.2, remove_corr_features=False):
-=======
 
 def load_wine(test_mode=False, remove_corr_features=False):
->>>>>>> f47478eed5a9ee09a67eb1f8b2b1d6f56ba87c96
     """
     loads the data into a structure for SCIKIT LEARN. data is stored as
     (n_subjects x n_features).
@@ -78,11 +74,7 @@ def load_wine(test_mode=False, remove_corr_features=False):
     else:
         n_samples = len(X_train)
 
-<<<<<<< HEAD
-    # data is accessed as data['X']['valid']
-=======
     # data is accessed as data['X']['test']
->>>>>>> f47478eed5a9ee09a67eb1f8b2b1d6f56ba87c96
     data = {
         'X': {'train': X_train, 'test': X_test},
         'y': {'train': y_train, 'test': y_test}
@@ -90,11 +82,8 @@ def load_wine(test_mode=False, remove_corr_features=False):
 
     LOGGER.debug('n TRAIN = {}, n TEST = {}'.format(
         X_train.shape[0], X_test.shape[0]))
-<<<<<<< HEAD
-=======
 
     return(data)
->>>>>>> f47478eed5a9ee09a67eb1f8b2b1d6f56ba87c96
 
 
 def plot_decision_tree_result(train_acc, test_acc, params_pairs):

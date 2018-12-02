@@ -20,10 +20,6 @@ def kfold_train_loop(data, model):
     selection, which is expected to be performed inside the submitted model as
     part of the pipeline.
     """
-<<<<<<< HEAD
-=======
-
->>>>>>> f47478eed5a9ee09a67eb1f8b2b1d6f56ba87c96
     model.fit(data['X']['train'], data['y']['train'])
     y_train_pred = model.predict(data['X']['train'])   # train scores
     y_test_pred =  model.predict(data['X']['test'])    # test scores
@@ -35,24 +31,18 @@ def kfold_train_loop(data, model):
         model_train_acc, model_test_acc))
 
     results = {'train': model_train_acc, 'test':  model_test_acc}
-<<<<<<< HEAD
-=======
 
     return(results, model)
->>>>>>> f47478eed5a9ee09a67eb1f8b2b1d6f56ba87c96
-
-    return results, model
 
 def svm(data):
     """linear svm with and without adaboost"""
-    model = models.boosted_SVM(data)
+    model = models.boosted_SVM()
     results, best_model = kfold_train_loop(data, model)
 
     return(results, best_model)
 
 
 def decision_tree(data, param_pairs):
-<<<<<<< HEAD
     """
     Decision tree experiment
     """
@@ -60,9 +50,6 @@ def decision_tree(data, param_pairs):
     _, single_model = kfold_train_loop(data, decision_tree)
     estimator = single_model.best_estimator_.named_steps['clf']
     
-=======
-    """decision trees with and without adaboost"""
->>>>>>> f47478eed5a9ee09a67eb1f8b2b1d6f56ba87c96
     storage = {'train_acc': [], 'test_acc': []}
     for max_depth, n_learners in param_pairs:
         model = models.random_forest(estimator, max_depth=max_depth, n_learners=n_learners)
@@ -73,11 +60,7 @@ def decision_tree(data, param_pairs):
     utils.plot_decision_tree_result(
         storage['train_acc'], storage['test_acc'], param_pairs)
 
-<<<<<<< HEAD
     return results
-=======
-    return(results, best_model)
->>>>>>> f47478eed5a9ee09a67eb1f8b2b1d6f56ba87c96
 
 
 def nn(data):

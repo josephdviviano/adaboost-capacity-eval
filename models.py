@@ -92,10 +92,7 @@ def boosted_SVM():
 
 def decision_tree():
     settings = {
-        'clf__max_depth': stats.randint(2, 9),
-        #'clf__min_samples_split': stats.randint(2, 5),
-        #'clf__min_samples_leaf': stats.randint(1, 10),
-        #'clf__max_features': stats.randint(2, )
+        'clf__max_depth': stats.randint(2, 9)
     }
 
     clf = DecisionTreeClassifier(criterion='entropy')
@@ -107,6 +104,8 @@ def decision_tree():
 
     model = RandomizedSearchCV(pipeline, settings, n_jobs=-1, verbose=VERB_LEVEL,
         n_iter=100, cv=SETTINGS['n_inner'], scoring='accuracy')
+
+    return model
 
 
 def random_forest(base_model, max_depth, n_learners):
