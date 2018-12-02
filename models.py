@@ -17,18 +17,21 @@ import logging
 import numpy as np
 import os
 
-
 LOGGER = logging.getLogger(os.path.basename(__file__))
+
+# use logger to figure out verbosity for RandomizedCV
+if LOGGER.getEffectiveLevel() != 20:
+    VERB_LEVEL = 2
+else:
+    VERB_LEVEL = 0
 
 # global settings for all cross-validation runs
 SETTINGS = {
     'n_cv': 50,
     'n_folds': 10,
-    'ada_lr': [10e-1, 10e-2, 10e-3, 10e-4, 10e-5]
+    'ada_lr': stats.uniform(10e-5, 10e-1)
 }
 
-# controls how chatty RandomizedCV is
-VERB_LEVEL = 0
 
 def SVM():
     """ baseline: linear classifier (without kernel)"""
@@ -148,10 +151,10 @@ def mlp(n_hid=100):
     # nb: 10 boosters with hid = 10 has 220*10 parameters
     # vs: 1 model with hid = 100 has 10*100 + 100*10 + 100 + 10 = 2110 params
 
-    # alpha = l2 regularization
+    # alpha = l2 regularization, reciprocal == log-uniform distribution
     settings = {
-        'clf__alpha': [10e-2, 10e-3, 10e-4, 10e-5, 10e-6, 10e-7, 10e-8],
-        'clf__learning_rate_init': [10e-2, 10e-3, 10e-4, 10e-5, 10e-6]
+        'clf__alpha': stats.reciprocal(10e-6, 10e-1),
+        'clf__learning_rate_init': stats.reciprocal(10e-6, 10e-1)
     }
 
     clf =  MLPClassifier(

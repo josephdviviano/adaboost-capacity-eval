@@ -59,7 +59,7 @@ def load_wine(test_mode=False, remove_corr_features=False):
     X_train = data_train[:, :-1]
     X_test  = data_test[:, :-1]
     y_train = _relabel_wine(data_train[:, -1])
-    y_test  = _relabel_wine(data_train[:, -1])
+    y_test  = _relabel_wine(data_test[:, -1])
 
     if remove_corr_features:
         all_features = list(range(X_train.shape[1]+1))
@@ -81,7 +81,7 @@ def load_wine(test_mode=False, remove_corr_features=False):
     }
 
     LOGGER.debug('n TRAIN = {}, n TEST = {}'.format(
-        X_train.shape[0], X_valid.shape[0], X_test.shape[0]))
+        X_train.shape[0], X_test.shape[0]))
 
     return(data)
 

@@ -12,6 +12,7 @@ import logging
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import sys
 import utils
 
 # adds a simple logger
@@ -40,6 +41,11 @@ def main(args):
 
     elif args.model == 'nn':
         single_pred, boosted_pred, single_model, boosted_model = exp.nn(data)
+
+    else:
+        LOGGER.warning('invalid experiment submitted -m {decision_tree, svm, nn}')
+        sys.exit(1)
+
 
     utils.write_results('results/wine.csv', results)
 

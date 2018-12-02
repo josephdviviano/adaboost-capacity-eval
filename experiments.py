@@ -4,7 +4,6 @@ holds different experiment functions (import and run these in train.py)
 from copy import copy
 from scipy import stats
 from sklearn.metrics import accuracy_score
-from sklearn.model_selection import StratifiedKFold
 import logging
 import matplotlib.pyplot as plt
 import models
@@ -34,7 +33,7 @@ def kfold_train_loop(data, model):
 
     results = {'train': model_train_acc, 'test':  model_test_acc}
 
-    return(results, best_model)
+    return(results, model)
 
 
 def svm(data):
@@ -66,9 +65,8 @@ def nn(data):
     model = models.mlp()
     single_results, single_best_model = kfold_train_loop(data, model)
 
-    # get the boosted model results using the hyperparameters learned on a
-    # single model
-    model = model.mlp_boosted(single_best_model)
+    # get the boosted model results using learned single model hyperparamaters
+    model = models.boosted_mlp(single_best_model)
     boosted_results, boosted_best_model = kfold_train_loop(data, model)
 
     return(single_results, boosted_results, single_best_model, boosted_best_model)
