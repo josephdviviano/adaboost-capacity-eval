@@ -55,7 +55,6 @@ def decision_tree(data, param_pairs):
     decision_tree = models.decision_tree(data)
     _, single_model = kfold_train_loop(data, decision_tree)
     estimator = single_model.best_estimator_.named_steps['clf']
-<<<<<<< HEAD
     
     LOGGER.info('**Best parameters**')
     LOGGER.info('max_depth: {}'.format(estimator.max_depth))
@@ -64,9 +63,6 @@ def decision_tree(data, param_pairs):
     LOGGER.info('max_features: {}'.format(estimator.max_features))
     LOGGER.info('min_impurity_decrease: {}'.format(estimator.min_impurity_decrease))
     
-=======
-
->>>>>>> cbcfa6cabb5d6e9fc721425736672bc5ce10005b
     storage = {'train_acc': [], 'test_acc': []}
     for max_depth, n_learners in param_pairs:
         model = models.random_forest(estimator, max_depth=max_depth, n_learners=n_learners)
@@ -74,7 +70,7 @@ def decision_tree(data, param_pairs):
         storage['train_acc'].append(results['train'])
         storage['test_acc'].append(results['test'])
 
-    utils.plot_result(
+    utils.plot_results(
         storage['train_acc'], storage['test_acc'], param_pairs, 'decision_tree')
 
     return storage
