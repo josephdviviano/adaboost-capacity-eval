@@ -22,7 +22,7 @@ def write_results(y_pred, y_true):
 
 
 def plot_results(train_acc, test_acc, param_pairs, exp_name):
-    param_pairs = [str(param) for param in list(param_pairs)]
+    param_pairs = [str(param) for param in param_pairs]
     plt.rcParams.update({'font.size': 6})
 
     x = np.arange(len(param_pairs))
@@ -32,7 +32,7 @@ def plot_results(train_acc, test_acc, param_pairs, exp_name):
     plt.ylim(0., 1.)
     plt.legend(['train accuracy', 'test accuracy'])
     plt.xlabel('parameter pairs')
-    plt.ylabel('accuracy')
+    plt.ylabel(yaxis)
     plt.savefig('./figures/{}.png'.format(exp_name))
     plt.close()
     #plt.clf()
