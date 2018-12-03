@@ -1,11 +1,11 @@
 """
 holds our models (e.g., imagenet, cnns, etc, to be imported into experiments.py)
 """
+from neural_network import MLPClassifier # custom mlp accepts sample weights
 from scipy import stats
 from sklearn.ensemble import AdaBoostClassifier
-from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import RandomizedSearchCV
-from neural_network import MLPClassifier
+from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
@@ -14,6 +14,7 @@ import argparse
 import logging
 import numpy as np
 import os
+
 
 LOGGER = logging.getLogger(os.path.basename(__file__))
 
@@ -42,7 +43,7 @@ def SVM():
     }
 
     # model we will train in our pipeline
-    clf = SVC(kernel='linear', max_iter=100)
+    clf = SVC(kernel='linear', max_iter=-1)
 
     # pipeline runs preprocessing and model during every CV loop
     pipe = Pipeline([
@@ -58,30 +59,25 @@ def SVM():
     return(model)
 
 
-def boosted_SVM():
+def boosted_SVM(model):
     """ baseline: linear classifier (without kernel)"""
-    LOGGER.debug('building boosted SVM model')
 
-    # hyperparameters to search for randomized cross validation
     settings = {
-        'clf__n_estimators': [25,30,35,40,45,50],
+	    'clf__n_estimators':[25,30,35,40,45,50],
         'clf__learning_rate': SETTINGS['ada_lr']
     }
 
-    # model we will train in our pipeline
-    #clf = SVC(kernel='linear', max_iter=-1  )
-    #clf = AdaBoostClassifier(SVC(C=stats.uniform(10e-3, 1), tol=stats.uniform(10e-5, 10e-1),probability=True, kernel='linear' ))
-    clf = AdaBoostClassifier(SVC(C=0.01, tol=0.001, probability=True, kernel='linear'))
+    estimator = model.best_estimator_.named_steps['clf']
+    clf = AdaBoostClassifier(
+        base_estimator=estimator, algorithm='SAMME'
+    )
 
-
-    # pipeline runs preprocessing and model during every CV loop
-    pipe = Pipeline([
+    pipeline = Pipeline([
         ('pre', StandardScaler()),
         ('clf', clf),
     ])
 
-    # this will learn our best parameters for the final
-    model = RandomizedSearchCV(pipe, settings, n_jobs=-1, verbose=VERB_LEVEL,
+    model = RandomizedSearchCV(pipeline, settings, n_jobs=-1, verbose=VERB_LEVEL,
         n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_folds'], scoring='accuracy'
     )
 
@@ -107,13 +103,12 @@ def decision_tree():
 
 
 def random_forest(base_model, max_depth, n_learners):
-
     settings = {
         'clf__learning_rate': stats.uniform(0.5, 1.5)
     }
 
+    # set up max_depth and n_learners (per-model parameters vs n in ensemble)
     base_model.max_depth = max_depth
-
     clf = AdaBoostClassifier(base_estimator=base_model, n_estimators=n_learners)
 
     pipeline = Pipeline([
@@ -172,15 +167,8 @@ def boosted_mlp(model):
         base_estimator=estimator, n_estimators=10, algorithm='SAMME'
     )
 
-    pipeline = Pipeline([
-        ('pre', StandardScaler()),
-        ('clf', clf),
-    ])
-
-    model = RandomizedSearchCV(pipeline, settings,
-        n_jobs=-1, verbose=VERB_LEVEL, n_iter=SETTINGS['n_cv'],
-        cv=SETTINGS['n_folds'], scoring='accuracy'
-    )
+    model = RandomizedSearchCV(pipeline, settings, n_jobs=-1, verbose=VERB_LEVEL,
+        n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_inner'], scoring='accuracy')
 
     return(model)
 
