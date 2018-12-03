@@ -32,7 +32,7 @@ VERB_LEVEL = 0
 
 # global settings for all cross-validation runs
 SETTINGS = {
-    'n_cv': 5,
+    'n_cv': 50,
     'n_folds': 10,
     'ada_lr': stats.uniform(10e-5, 10e-1)
 }
@@ -147,10 +147,6 @@ def random_forest(base_model, max_depth, n_learners):
 
 def mlp(n_hid=100):
     """build a not-boosted MLP classifier"""
-    # estimate number of paramaters for single MLP assuming 10 features
-    # nb: 10 boosters with hid = 10 has 220*10 parameters
-    # vs: 1 model with hid = 100 has 10*100 + 100*10 + 100 + 10 = 2110 params
-
     # alpha = l2 regularization, reciprocal == log-uniform distribution
     settings = {
         'clf__alpha': stats.reciprocal(10e-6, 10e-1),
@@ -159,7 +155,7 @@ def mlp(n_hid=100):
 
     clf =  MLPClassifier(
         activation='relu', solver='sgd',  batch_size=32,
-        hidden_layer_sizes=(100), learning_rate='invscaling', momentum=0.9,
+        hidden_layer_sizes=n_hid, learning_rate='invscaling', momentum=0.9,
         nesterovs_momentum=True, early_stopping=True
     )
 

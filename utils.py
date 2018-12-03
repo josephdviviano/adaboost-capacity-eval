@@ -69,10 +69,9 @@ def load_wine(test_mode=False, remove_corr_features=False):
 
     # test_mode uses a small subset of the data
     if test_mode:
-        LOGGER.info('running in test mode, n=500')
-        n_samples = 500
-    else:
-        n_samples = len(X_train)
+        LOGGER.info('running in test mode, train n=500')
+        X_train = X_train[:500, :]
+        y_train = y_train[:500]
 
     # data is accessed as data['X']['test']
     data = {
@@ -100,5 +99,4 @@ def plot_results(train_acc, test_acc, params_pairs, exp_name):
 
 def load_covertype(test_mode=False, valid_pct=0.1):
     pass
-
 
