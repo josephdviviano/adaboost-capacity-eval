@@ -66,7 +66,7 @@ def decision_tree(data, param_pairs):
     utils.plot_result(
         storage['train_acc'], storage['test_acc'], param_pairs, 'decision_tree')
 
-    return storage
+    return(storage)
 
 
 def mlp(data, param_pairs):
@@ -84,7 +84,9 @@ def mlp(data, param_pairs):
         storage['train_acc'].append(boosted_results['train'])
         storage['test_acc'].append(boosted_results['test'])
 
+    utils.plot_result(
+        storage['train_acc'], storage['test_acc'], param_pairs, 'mlp')
 
-    return(single_results, storage, single_best_model, boosted_best_model)
+    return(storage)
 
 

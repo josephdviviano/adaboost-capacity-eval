@@ -14,11 +14,8 @@ import os
 import sys
 import utils
 
-# adds a simple logger
 logging.basicConfig(level=logging.INFO, format="[%(name)s:%(funcName)s:%(lineno)s] %(levelname)s: %(message)s")
 LOGGER = logging.getLogger()
-
-category_map = {}
 
 def main(args):
 
@@ -39,7 +36,8 @@ def main(args):
         svm_pred, svm_model = exp.svm(data)
 
     elif args.model == 'mlp':
-        single_pred, boosted_pred, single_model, boosted_model = exp.mlp(data)
+        param_pairs = [(100, 1), (50, 2), (25, 4), (20, 5), (10, 10), (5, 20)]
+        results = exp.mlp(data, param_pairs)
 
     else:
         LOGGER.warning('invalid experiment submitted -m {decision_tree, svm, mlp}')

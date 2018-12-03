@@ -5,7 +5,6 @@ from neural_network import MLPClassifier # custom mlp accepts sample weights
 from scipy import stats
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.model_selection import RandomizedSearchCV
-from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
@@ -26,7 +25,7 @@ else:
 
 # global settings for all cross-validation runs
 SETTINGS = {
-    'n_cv': 50,
+    'n_cv': 5,
     'n_folds': 10,
     'ada_lr': stats.uniform(10e-5, 10e-1)
 }
@@ -97,7 +96,7 @@ def decision_tree():
     ])
 
     model = RandomizedSearchCV(pipeline, settings, n_jobs=-1, verbose=VERB_LEVEL,
-        n_iter=100, cv=SETTINGS['n_inner'], scoring='accuracy')
+        n_iter=100, cv=SETTINGS['n_folds'], scoring='accuracy')
 
     return model
 
@@ -154,7 +153,7 @@ def mlp(n_hid=100):
     return(model)
 
 
-def boosted_mlp(model):
+def boosted_mlp(model, n_hid=10, n_learners=10):
     """uses model learned by mlp_single for the model settings"""
     settings = {
         'clf__learning_rate': SETTINGS['ada_lr']
@@ -162,13 +161,18 @@ def boosted_mlp(model):
 
     # now set hidden layer size to 10
     estimator = model.best_estimator_.named_steps['clf']
-    estimator.hidden_layer_sizes = 10
+    estimator.hidden_layer_sizes = n_hid
     clf = AdaBoostClassifier(
-        base_estimator=estimator, n_estimators=10, algorithm='SAMME'
+        base_estimator=estimator, n_estimators=n_learners, algorithm='SAMME'
     )
 
+    pipeline = Pipeline([
+        ('pre', StandardScaler()),
+        ('clf', clf),
+    ])
+
     model = RandomizedSearchCV(pipeline, settings, n_jobs=-1, verbose=VERB_LEVEL,
-        n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_inner'], scoring='accuracy')
+        n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_folds'], scoring='accuracy')
 
     return(model)
 
