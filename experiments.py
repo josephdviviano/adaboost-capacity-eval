@@ -71,12 +71,12 @@ def decision_tree(data, param_pairs):
         storage['test_acc'].append(results['test'])
 
     utils.plot_results(
-        storage['train_acc'], storage['test_acc'], param_pairs, 'decision_tree')
+        storage['train_acc'], storage['test_acc'], param_pairs, experiment_name)
 
     return(storage)
 
 
-def mlp(data, param_pairs):
+def mlp(data, param_pairs, experiment_name):
     """mlp with and without adaboost"""
     # get the non-boosted model results
     model = models.mlp(n_hid=param_pairs[0][0])
@@ -92,7 +92,7 @@ def mlp(data, param_pairs):
         storage['test_acc'].append(boosted_results['test'])
 
     utils.plot_results(
-        storage['train_acc'], storage['test_acc'], param_pairs, 'mlp')
+        storage['train_acc'], storage['test_acc'], param_pairs, experiment_name)
 
     return(storage)
 

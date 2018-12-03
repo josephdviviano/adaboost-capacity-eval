@@ -1,25 +1,39 @@
 """
 helper functions
 """
-from sklearn.preprocessing import LabelEncoder
 import logging
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+from sklearn.preprocessing import LabelEncoder
 
 '''remove annoying DeprecationWarning from sklearn script'''
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-CORR_FEATURES = [2, 6, 7]
-
 LOGGER = logging.getLogger(os.path.basename(__file__))
+
 
 def write_results(y_pred, y_true):
     """
     writes a confusion matrix, etc
     """
     pass
+
+
+def plot_results(train_acc, test_acc, param_pairs, exp_name):
+    param_pairs = [str(param) for param in param_pairs]
+    plt.rcParams.update({'font.size': 6})
+
+    x = np.arange(len(param_pairs))
+    plt.plot(x, train_acc)
+    plt.plot(x, test_acc)
+    plt.xticks(x, param_pairs)
+
+    plt.legend(['train accuracy', 'test accuracy'])
+    plt.xlabel('parameter pairs')
+    plt.ylabel('accuracy')
+    plt.savefig('./figures/{}.png'.format(exp_name))
 
 
 def _relabel_wine(targets, num_classes=5):
@@ -63,7 +77,7 @@ def load_wine(test_mode=False, remove_corr_features=False):
 
     if remove_corr_features:
         all_features = list(range(X_train.shape[1]))
-        keep_features = [x for x in all_features if x not in CORR_FEATURES]
+        keep_features = [x for x in all_features if x not in [2, 6, 7]]
         X_train = X_train[:, keep_features]
         X_test  = X_test[:, keep_features]
 
@@ -85,18 +99,44 @@ def load_wine(test_mode=False, remove_corr_features=False):
     return(data)
 
 
-def plot_results(train_acc, test_acc, params_pairs, exp_name):
-    params_pairs = [str(param) for param in params_pairs]
-    plt.rcParams.update({'font.size': 6})
-    plt.plot(params_pairs, train_acc)
-    plt.plot(params_pairs, test_acc)
-    plt.legend(['train accuracy', 'test accuracy'])
-    plt.xlabel('parameter pairs')
-    plt.ylabel('accuracy')
-    plt.savefig('./figures/{}.png'.format(exp_name))
-    plt.show()
+def load_covertype(test_mode=False, test_pct=0.1):
+    ## TODO: we're going to scale all of the one-hot encoded features later...
+    ##       this is likely bad (but for now, it's fine)... jdv
+    ##       this is a good solution:
+    ##       https://scikit-learn.org/dev/auto_examples/compose/plot_column_transformer_mixed_types.html#sphx-glr-auto-examples-compose-plot-column-transformer-mixed-types-py
 
+    data = np.genfromtxt('data/covtype.csv', delimiter=',')
 
-def load_covertype(test_mode=False, valid_pct=0.1):
-    pass
+    # shuffle data as we extract it to X and y
+    idx = np.arange(len(data))
+    np.random.shuffle(idx)
+
+    X = data[idx, :-1]
+    le = LabelEncoder()
+    y = le.fit_transform(data[idx, -1])
+
+    # split into training and test set
+    n_test = np.floor(len(X) * test_pct)
+    X_test = X[:n_test, :]
+    y_test = y[:n_test]
+    X_train = X[n_test:, :]
+    y_train = y[n_test:]
+
+    # test_mode uses a small subset of the data
+    if test_mode:
+        LOGGER.info('running in test mode, train n=500')
+        X_train = X_train[:500, :]
+        y_train = y_train[:500]
+
+    # data is accessed as data['X']['test']
+    data = {
+        'X': {'train': X_train, 'test': X_test},
+        'y': {'train': y_train, 'test': y_test}
+    }
+
+    LOGGER.debug('n TRAIN = {}, n TEST = {}'.format(
+        X_train.shape[0], X_test.shape[0]))
+
+    return(data)
+
 

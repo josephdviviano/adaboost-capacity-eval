@@ -26,19 +26,24 @@ def main(args):
     log_hdl.setFormatter(logging.Formatter('%(message)s'))
     LOGGER.addHandler(log_hdl)
 
-    data = utils.load_wine(args.test)
+    # load our two datasets
+    wine_data = utils.load_wine(args.test)
+    covt_data = utils.load_covertype(args.test)
 
     if args.model == 'decision_tree':
         #param_pairs = [(6, 1), (5, 5), (4, 10), (3, 15), (2, 20), (1, 25)]
         param_pairs = [(6, 1), (5, 2), (4, 3), (3, 4), (2, 5), (1, 6)]
-        results = exp.decision_tree(data, param_pairs)
+        results = exp.decision_tree(wine_data, param_pairs, 'tree-wine')
+        results = exp.decision_tree(covt_data, param_pairs, 'tree-covt')
 
     elif args.model == 'svm':
-        svm_pred, svm_model = exp.svm(data)
+        svm_pred, svm_model = exp.svm(wine_data, 'svm-wine')
+        svm_pred, svm_model = exp.svm(wine_data, 'svm-covt')
 
     elif args.model == 'mlp':
         param_pairs = [(100, 1), (50, 2), (25, 4), (20, 5), (10, 10), (5, 20)]
-        results = exp.mlp(data, param_pairs)
+        results = exp.mlp(wine_data, param_pairs, 'mlp-wine')
+        results = exp.mlp(wine_data, param_pairs, 'mlp-covt')
 
     else:
         LOGGER.warning('invalid experiment submitted -m {decision_tree, svm, mlp}')
