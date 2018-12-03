@@ -5,6 +5,7 @@ ift6390-final
 ```
 python train_wine --model decision_tree --adaboost True
 ```
+Controling capacity: setting the minimum number of samples required at a leaf node or setting the maximum depth of the tree
 ## SVM experiment
 ```
 python train_wine --model svm --adaboost True
