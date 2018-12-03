@@ -1,6 +1,12 @@
 """
 holds our models (e.g., imagenet, cnns, etc, to be imported into experiments.py)
 """
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+'''remove annoying DeprecationWarning from sklearn AdaBoostClassifier'''
+
+from scipy import stats
+from sklearn.linear_model import LogisticRegression
 from neural_network import MLPClassifier # custom mlp accepts sample weights
 from scipy import stats
 from sklearn.ensemble import AdaBoostClassifier
@@ -13,15 +19,16 @@ import argparse
 import logging
 import numpy as np
 import os
+from sklearn.ensemble import AdaBoostClassifier
 
 
 LOGGER = logging.getLogger(os.path.basename(__file__))
 
 # use logger to figure out verbosity for RandomizedCV
-if LOGGER.getEffectiveLevel() != 20:
-    VERB_LEVEL = 2
-else:
-    VERB_LEVEL = 0
+#if LOGGER.getEffectiveLevel() != 20:
+#    VERB_LEVEL = 2
+#else:
+VERB_LEVEL = 0
 
 # global settings for all cross-validation runs
 SETTINGS = {
@@ -83,9 +90,25 @@ def boosted_SVM(model):
     return(model)
 
 
-def decision_tree():
+def decision_tree(data):
+    """
+    Decision tree model with search
+    """
+    n_features = data['X']['train'].shape[1]
+    n_samples = data['X']['train'].shape[0]
+    min_samples_split = [int(0.001*n_samples), int(0.1*n_samples)]
+    min_samples_leaf = [int(0.0005 * n_samples), int(0.05 * n_samples)]
+
+    LOGGER.info('Setting for the decision tree model:')
+    LOGGER.info('min_samples_split: {}'.format(min_samples_split))
+    LOGGER.info('min_samples_leaf: {}'.format(min_samples_leaf))
+
     settings = {
-        'clf__max_depth': stats.randint(2, 9)
+        'clf__max_depth': stats.randint(1, n_features),
+        'clf__min_samples_split': stats.randint(*min_samples_split),
+        'clf__min_samples_leaf': stats.randint(*min_samples_leaf),
+        'clf__max_features': stats.randint(1, n_features),
+        'clf__min_impurity_decrease': stats.uniform(0., 0.1)
     }
 
     clf = DecisionTreeClassifier(criterion='entropy')
@@ -103,16 +126,16 @@ def decision_tree():
 
 def random_forest(base_model, max_depth, n_learners):
     settings = {
-        'clf__learning_rate': stats.uniform(0.5, 1.5)
+        'booster__learning_rate': SETTINGS['ada_lr']
     }
 
     # set up max_depth and n_learners (per-model parameters vs n in ensemble)
     base_model.max_depth = max_depth
-    clf = AdaBoostClassifier(base_estimator=base_model, n_estimators=n_learners)
+    booster = AdaBoostClassifier(base_estimator=base_model, n_estimators=n_learners)
 
     pipeline = Pipeline([
         ('pre', StandardScaler()),
-        ('clf', clf),
+        ('booster', booster),
     ])
 
     model = RandomizedSearchCV(pipeline, settings, n_jobs=-1, verbose=VERB_LEVEL,
