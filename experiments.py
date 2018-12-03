@@ -21,6 +21,7 @@ def kfold_train_loop(data, model):
     selection, which is expected to be performed inside the submitted model as
     part of the pipeline.
     """
+    t1 = time.time()
     model.fit(data['X']['train'], data['y']['train'])
     y_train_pred = model.predict(data['X']['train'])   # train scores
     y_test_pred =  model.predict(data['X']['test'])    # test scores
@@ -28,8 +29,9 @@ def kfold_train_loop(data, model):
     model_train_acc = accuracy_score(y_train_pred, data['y']['train'])
     model_test_acc = accuracy_score(y_test_pred, data['y']['test'])
 
-    LOGGER.info('train/test accuracy after cross-validation: {}/{}'.format(
-        model_train_acc, model_test_acc))
+    t2 = time.time()
+    LOGGER.info('train/test accuracy after cross-val in {} sec: {}/{}'.format(
+        t2-t1, model_train_acc, model_test_acc))
 
     results = {'train': model_train_acc, 'test':  model_test_acc}
 

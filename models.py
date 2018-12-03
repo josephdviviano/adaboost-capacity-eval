@@ -2,8 +2,9 @@
 holds our models (e.g., imagenet, cnns, etc, to be imported into experiments.py)
 """
 import warnings
-warnings.filterwarnings("ignore", category=DeprecationWarning)
-'''remove annoying DeprecationWarning from sklearn AdaBoostClassifier'''
+#warnings.filterwarnings("ignore", category=DeprecationWarning) # adaboost
+#warnings.filterwarnings("ignore", category=ConvergenceWarning) # svc
+warnings.filterwarnings("ignore")
 
 from scipy import stats
 from sklearn.linear_model import LogisticRegression
@@ -44,12 +45,12 @@ def SVM():
 
     # hyperparameters to search for randomized cross validation
     settings = {
-        'clf__tol': stats.uniform(10e-5, 10e-1),
+        'clf__tol': stats.uniform(10e-3, 10e-1),
         'clf__C': stats.uniform(10e-3, 1)
     }
 
     # model we will train in our pipeline
-    clf = SVC(kernel='linear', max_iter=-1)
+    clf = SVC(kernel='linear', max_iter=5e3)
 
     # pipeline runs preprocessing and model during every CV loop
     pipe = Pipeline([

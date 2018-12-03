@@ -34,6 +34,7 @@ def plot_results(train_acc, test_acc, param_pairs, exp_name):
     plt.xlabel('parameter pairs')
     plt.ylabel('accuracy')
     plt.savefig('./figures/{}.png'.format(exp_name))
+    plt.clf()
 
 
 def _relabel_wine(targets, num_classes=5):
