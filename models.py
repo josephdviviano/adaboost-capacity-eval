@@ -9,7 +9,6 @@ warnings.filterwarnings("ignore")
 from scipy import stats
 from sklearn.linear_model import LogisticRegression
 from neural_network import MLPClassifier # custom mlp accepts sample weights
-from scipy import stats
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.pipeline import Pipeline
@@ -20,7 +19,6 @@ import argparse
 import logging
 import numpy as np
 import os
-from sklearn.ensemble import AdaBoostClassifier
 
 
 LOGGER = logging.getLogger(os.path.basename(__file__))
@@ -35,7 +33,8 @@ VERB_LEVEL = 0
 SETTINGS = {
     'n_cv': 50,
     'n_folds': 10,
-    'ada_lr': stats.uniform(10e-5, 10e-1)
+    'ada_lr': stats.uniform(10e-5, 10e-1),
+    'cv_score': 'f1_macro'
 }
 
 
@@ -60,7 +59,7 @@ def SVM():
 
     # this will learn our best parameters for the final model
     model = RandomizedSearchCV(pipe, settings, n_jobs=-1, verbose=VERB_LEVEL,
-        n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_folds'], scoring='accuracy'
+        n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_folds'], scoring=SETTINGS['cv_score']
     )
 
     return(model)
@@ -86,7 +85,7 @@ def boosted_SVM(estimator, C=1, n_learners=10):
     ])
 
     model = RandomizedSearchCV(pipeline, settings, n_jobs=-1, verbose=VERB_LEVEL,
-        n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_folds'], scoring='accuracy'
+        n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_folds'], scoring=SETTINGS['cv_score']
     )
 
     return(model)
@@ -120,7 +119,8 @@ def decision_tree(data):
     ])
 
     model = RandomizedSearchCV(pipeline, settings, n_jobs=-1, verbose=VERB_LEVEL,
-        n_iter=100, cv=SETTINGS['n_folds'], scoring='accuracy')
+        n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_folds'], scoring=SETTINGS['cv_score']
+    )
 
     return model
 
@@ -142,7 +142,7 @@ def random_forest(base_model, max_depth, n_learners):
     ])
 
     model = RandomizedSearchCV(pipeline, settings, n_jobs=-1, verbose=VERB_LEVEL,
-        n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_folds'], scoring='accuracy'
+        n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_folds'], scoring=SETTINGS['cv_score']
     )
 
     return(model)
@@ -169,9 +169,8 @@ def mlp():
         ('clf', clf),
     ])
 
-    model = RandomizedSearchCV(pipeline, settings,
-        n_jobs=-1, verbose=VERB_LEVEL, n_iter=SETTINGS['n_cv'],
-        cv=SETTINGS['n_folds'], scoring='accuracy'
+    model = RandomizedSearchCV(pipeline, settings, n_jobs=-1, verbose=VERB_LEVEL,
+        n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_folds'], scoring=SETTINGS['cv_score']
     )
 
     return(model)
@@ -197,7 +196,8 @@ def boosted_mlp(estimator, n_hid=10, n_learners=10):
     ])
 
     model = RandomizedSearchCV(pipeline, settings, n_jobs=-1, verbose=VERB_LEVEL,
-        n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_folds'], scoring='accuracy')
+        n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_folds'], scoring=SETTINGS['cv_score']
+    )
 
     return(model)
 
