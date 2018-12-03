@@ -21,7 +21,7 @@ def write_results(y_pred, y_true):
     pass
 
 
-def plot_results(train_acc, test_acc, param_pairs, exp_name):
+def plot_results(train_acc, test_acc, param_pairs, exp_name, yaxis):
     param_pairs = [str(param) for param in param_pairs]
     plt.rcParams.update({'font.size': 6})
 
@@ -29,7 +29,7 @@ def plot_results(train_acc, test_acc, param_pairs, exp_name):
     plt.plot(x, train_acc)
     plt.plot(x, test_acc)
     plt.xticks(x, param_pairs)
-    plt.ylim(0., 1.)
+    plt.ylim(0.2, 0.8)
     plt.legend(['train accuracy', 'test accuracy'])
     plt.xlabel('parameter pairs')
     plt.ylabel(yaxis)
@@ -101,13 +101,13 @@ def load_wine(test_mode=False, remove_corr_features=False):
     return(data)
 
 
-def load_covertype(test_mode=False, test_pct=0.1):
+def load_covertype(test_mode=False, test_pct=0.1, balanced=False):
     ## TODO: we're going to scale all of the one-hot encoded features later...
     ##       this is likely bad (but for now, it's fine)... jdv
     ##       this is a good solution:
     ##       https://scikit-learn.org/dev/auto_examples/compose/plot_column_transformer_mixed_types.html#sphx-glr-auto-examples-compose-plot-column-transformer-mixed-types-py
-
-    data = np.genfromtxt('data/covtype.csv', delimiter=',')
+    path = 'data/covtype.csv' if not balanced else 'data/covtype_balanced.csv'
+    data = np.genfromtxt(path, delimiter=',')
 
     # shuffle data as we extract it to X and y
     idx = np.arange(len(data))

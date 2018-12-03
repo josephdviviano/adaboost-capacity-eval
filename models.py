@@ -98,8 +98,8 @@ def decision_tree(data):
     LOGGER.debug('building decision tree model')
     n_features = data['X']['train'].shape[1]
     n_samples = data['X']['train'].shape[0]
-    min_samples_split = [2, int(0.1*n_samples)]
-    min_samples_leaf = [1, int(0.05 * n_samples)]
+    min_samples_split = [2, int(0.01*n_samples)]
+    min_samples_leaf = [1, int(0.005 * n_samples)]
 
     LOGGER.info('Setting for the decision tree model:')
     LOGGER.info('min_samples_split: {}'.format(min_samples_split))
