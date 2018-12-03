@@ -86,15 +86,15 @@ def load_wine(test_mode=False, remove_corr_features=False):
     return(data)
 
 
-def plot_decision_tree_result(train_acc, test_acc, params_pairs):
+def plot_results(train_acc, test_acc, params_pairs, exp_name):
     params_pairs = [str(param) for param in params_pairs]
     plt.rcParams.update({'font.size': 6})
     plt.plot(params_pairs, train_acc)
     plt.plot(params_pairs, test_acc)
     plt.legend(['train accuracy', 'test accuracy'])
     plt.xlabel('parameter pairs')
-    plt.ylabel('gradient')
-    plt.savefig('./figures/decision_tree.png')
+    plt.ylabel('accuracy')
+    plt.savefig('./figures/{}.png'.format(exp_name))
     plt.show()
 
 

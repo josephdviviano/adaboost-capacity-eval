@@ -14,6 +14,7 @@ import utils
 
 LOGGER = logging.getLogger(os.path.basename(__file__))
 
+
 def kfold_train_loop(data, model):
     """
     trains a model using stratified kfold cross validation for hyperparameter
@@ -34,11 +35,16 @@ def kfold_train_loop(data, model):
 
     return(results, model)
 
+
 def svm(data):
     """linear svm with and without adaboost"""
-    model = models.boosted_SVM()
-    results, best_model = kfold_train_loop(data, model)
+    # get the non-boosted model results
+    model = models.SVM()
+    single_results, single_best_model = kfold_train_loop(data, model)
 
+    # get the boosted model results
+    model = models.boosted_SVM(single_best_model) # returns a model ready to train
+    results, best_model = kfold_train_loop(data, model)
     return(results, best_model)
 
 
@@ -49,6 +55,7 @@ def decision_tree(data, param_pairs):
     decision_tree = models.decision_tree(data)
     _, single_model = kfold_train_loop(data, decision_tree)
     estimator = single_model.best_estimator_.named_steps['clf']
+<<<<<<< HEAD
     
     LOGGER.info('**Best parameters**')
     LOGGER.info('max_depth: {}'.format(estimator.max_depth))
@@ -57,6 +64,9 @@ def decision_tree(data, param_pairs):
     LOGGER.info('max_features: {}'.format(estimator.max_features))
     LOGGER.info('min_impurity_decrease: {}'.format(estimator.min_impurity_decrease))
     
+=======
+
+>>>>>>> cbcfa6cabb5d6e9fc721425736672bc5ce10005b
     storage = {'train_acc': [], 'test_acc': []}
     for max_depth, n_learners in param_pairs:
         model = models.random_forest(estimator, max_depth=max_depth, n_learners=n_learners)
@@ -64,22 +74,28 @@ def decision_tree(data, param_pairs):
         storage['train_acc'].append(results['train'])
         storage['test_acc'].append(results['test'])
 
-    utils.plot_decision_tree_result(
-        storage['train_acc'], storage['test_acc'], param_pairs)
+    utils.plot_result(
+        storage['train_acc'], storage['test_acc'], param_pairs, 'decision_tree')
 
-    return results
+    return storage
 
 
-def mlp(data):
+def mlp(data, param_pairs):
     """mlp with and without adaboost"""
     # get the non-boosted model results
     model = models.mlp()
-    single_results, single_best_model = kfold_train_loop(data, model)
+    single_results, single_model = kfold_train_loop(data, model)
+
+    storage = {'train_acc': [], 'test_acc': []}
 
     # get the boosted model results using learned single model hyperparamaters
-    model = models.boosted_mlp(single_best_model)
-    boosted_results, boosted_best_model = kfold_train_loop(data, model)
+    for n_hid, n_learners in param_pairs:
+        model = models.boosted_mlp(single_model, n_hid=n_hid, n_learners=n_learners)
+        boosted_results, boosted_best_model = kfold_train_loop(data, model)
+        storage['train_acc'].append(boosted_results['train'])
+        storage['test_acc'].append(boosted_results['test'])
 
-    return(single_results, boosted_results, single_best_model, boosted_best_model)
+
+    return(single_results, storage, single_best_model, boosted_best_model)
 
 
