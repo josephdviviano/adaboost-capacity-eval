@@ -1,18 +1,18 @@
 """
 helper functions
 """
-
 from sklearn.preprocessing import LabelEncoder
 import logging
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-import warnings
 
-warnings.filterwarnings("ignore",category=DeprecationWarning)
 '''remove annoying DeprecationWarning from sklearn script'''
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 CORR_FEATURES = [2, 6, 7]
+
 LOGGER = logging.getLogger(os.path.basename(__file__))
 
 def write_results(y_pred, y_true):
@@ -62,10 +62,10 @@ def load_wine(test_mode=False, remove_corr_features=False):
     y_test  = _relabel_wine(data_test[:, -1])
 
     if remove_corr_features:
-        all_features = list(range(X_train.shape[1]+1))
+        all_features = list(range(X_train.shape[1]))
         keep_features = [x for x in all_features if x not in CORR_FEATURES]
-        X_train = data_train[:, keep_features]
-        X_test  = data_test[:, keep_features]
+        X_train = X_train[:, keep_features]
+        X_test  = X_test[:, keep_features]
 
     # test_mode uses a small subset of the data
     if test_mode:
