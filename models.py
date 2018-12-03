@@ -93,7 +93,9 @@ def boosted_SVM(estimator, C=1, n_learners=10):
 
 
 def decision_tree(data):
-    """decision tree model"""
+    """
+    decision tree model
+    """
     LOGGER.debug('building decision tree model')
     n_features = data['X']['train'].shape[1]
     n_samples = data['X']['train'].shape[0]
@@ -120,7 +122,7 @@ def decision_tree(data):
     ])
 
     model = RandomizedSearchCV(pipeline, settings, n_jobs=-1, verbose=VERB_LEVEL,
-        n_iter=100, cv=SETTINGS['n_folds'], scoring='accuracy')
+        n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_folds'], scoring='accuracy')
 
     return model
 

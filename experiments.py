@@ -38,7 +38,7 @@ def kfold_train_loop(data, model):
     return(results, model)
 
 
-def svm(data, n_estimators, experiment_name):
+def svm(data, n_estimators, experiment_name, boosted=False):
     """linear svm with and without adaboost"""
     # get the non-boosted model results
     model = models.SVM()
@@ -47,9 +47,7 @@ def svm(data, n_estimators, experiment_name):
 
     # use optimal parameter C to generate param_pairs
     C = estimator.C
-    param_pairs = []
-    for n in n_estimators:
-        param_pairs.append((C/n, n))
+    param_pairs = [(C/n, n) for n in n_estimators] if boosted else [(C/n, 1) for n in n_estimators] 
 
     storage = {'train_acc': [], 'test_acc': []}
     for C, n_learners in param_pairs:
@@ -64,7 +62,7 @@ def svm(data, n_estimators, experiment_name):
     return(storage)
 
 
-def decision_tree(data, param_pairs, experiment_name):
+def decision_tree(data, n_estimators, experiment_name, boosted=False):
     """decision tree with and without adaboost"""
     decision_tree = models.decision_tree(data)
     _, single_model = kfold_train_loop(data, decision_tree)
@@ -77,6 +75,10 @@ def decision_tree(data, param_pairs, experiment_name):
     LOGGER.info('max_features: {}'.format(estimator.max_features))
     LOGGER.info('min_impurity_decrease: {}'.format(estimator.min_impurity_decrease))
 
+    init_max_depth = estimator.max_depth
+    max_depths = list(range(init_max_depth+len(n_estimators), init_max_depth, -1))
+    param_pairs = list(zip(max_depths, n_estimators)) if boosted else list(zip(max_depths, [1]*len(n_estimators)))
+
     storage = {'train_acc': [], 'test_acc': []}
     for max_depth, n_learners in param_pairs:
         model = models.random_forest(estimator, max_depth=max_depth, n_learners=n_learners)
@@ -84,13 +86,16 @@ def decision_tree(data, param_pairs, experiment_name):
         storage['train_acc'].append(results['train'])
         storage['test_acc'].append(results['test'])
 
+    experiment_name = (
+        '{}-{}'.format(experiment_name, 'boosted') if boosted else '{}-{}'.format(experiment_name, 'not-boosted')
+    )
     utils.plot_results(
         storage['train_acc'], storage['test_acc'], param_pairs, experiment_name)
 
     return(storage)
 
 
-def mlp(data, n_estimators, experiment_name):
+def mlp(data, n_estimators, experiment_name, boosted=False):
     """mlp with and without adaboost"""
     # get the non-boosted model results
     model = models.mlp()
@@ -98,10 +103,9 @@ def mlp(data, n_estimators, experiment_name):
     estimator = single_model.best_estimator_.named_steps['clf']
 
     # use optimal parameter C to generate param_pairs
-    n_hid = estimator.hidden_layer_sizes
-    param_pairs = []
-    for n in n_estimators:
-        param_pairs.append((int(np.floor(n_hid/n)), n))
+    hidden_size = estimator.hidden_layer_sizes
+    hidden_sizes = [int(np.floor(hidden_size / n)) for n in n_estimators]
+    param_pairs = list(zip(hidden_sizes, n_estimators)) if boosted else list(zip(hidden_sizes, [1] * len(n_estimators))) 
 
     storage = {'train_acc': [], 'test_acc': []}
 
@@ -112,6 +116,7 @@ def mlp(data, n_estimators, experiment_name):
         storage['train_acc'].append(boosted_results['train'])
         storage['test_acc'].append(boosted_results['test'])
 
+    experiment_name = '{}-{}'.format(experiment_name, 'boosted') if boosted else experiment_name
     utils.plot_results(
         storage['train_acc'], storage['test_acc'], param_pairs, experiment_name)
 

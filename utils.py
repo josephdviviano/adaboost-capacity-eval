@@ -22,19 +22,20 @@ def write_results(y_pred, y_true):
 
 
 def plot_results(train_acc, test_acc, param_pairs, exp_name):
-    param_pairs = [str(param) for param in param_pairs]
+    param_pairs = [str(param) for param in list(param_pairs)]
     plt.rcParams.update({'font.size': 6})
 
     x = np.arange(len(param_pairs))
     plt.plot(x, train_acc)
     plt.plot(x, test_acc)
     plt.xticks(x, param_pairs)
-
+    plt.ylim(0., 1.)
     plt.legend(['train accuracy', 'test accuracy'])
     plt.xlabel('parameter pairs')
     plt.ylabel('accuracy')
     plt.savefig('./figures/{}.png'.format(exp_name))
-    plt.clf()
+    plt.close()
+    #plt.clf()
 
 
 def _relabel_wine(targets, num_classes=5):
