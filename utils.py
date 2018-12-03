@@ -116,7 +116,8 @@ def load_covertype(test_mode=False, test_pct=0.1):
     y = le.fit_transform(data[idx, -1])
 
     # split into training and test set
-    n_test = np.floor(len(X) * test_pct)
+    n_test = int(np.floor(len(X) * test_pct))
+
     X_test = X[:n_test, :]
     y_test = y[:n_test]
     X_train = X[n_test:, :]
@@ -124,9 +125,9 @@ def load_covertype(test_mode=False, test_pct=0.1):
 
     # test_mode uses a small subset of the data
     if test_mode:
-        LOGGER.info('running in test mode, train n=500')
-        X_train = X_train[:500, :]
-        y_train = y_train[:500]
+        LOGGER.info('running in test mode, train n=5000')
+        X_train = X_train[:5000, :]
+        y_train = y_train[:5000]
 
     # data is accessed as data['X']['test']
     data = {
@@ -138,5 +139,4 @@ def load_covertype(test_mode=False, test_pct=0.1):
         X_train.shape[0], X_test.shape[0]))
 
     return(data)
-
 

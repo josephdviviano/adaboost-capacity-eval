@@ -28,7 +28,7 @@ def kfold_train_loop(data, model):
     model_train_acc = accuracy_score(y_train_pred, data['y']['train'])
     model_test_acc = accuracy_score(y_test_pred, data['y']['test'])
 
-    LOGGER.info('train/valid accuracy: {}/{}'.format(
+    LOGGER.info('train/test accuracy after cross-validation: {}/{}'.format(
         model_train_acc, model_test_acc))
 
     results = {'train': model_train_acc, 'test':  model_test_acc}
@@ -36,22 +36,34 @@ def kfold_train_loop(data, model):
     return(results, model)
 
 
-def svm(data):
+def svm(data, n_estimators, experiment_name):
     """linear svm with and without adaboost"""
     # get the non-boosted model results
     model = models.SVM()
-    single_results, single_best_model = kfold_train_loop(data, model)
+    _, single_best_model = kfold_train_loop(data, model)
+    estimator = single_best_model.best_estimator_.named_steps['clf']
 
-    # get the boosted model results
-    model = models.boosted_SVM(single_best_model) # returns a model ready to train
-    results, best_model = kfold_train_loop(data, model)
-    return(results, best_model)
+    # use optimal parameter C to generate param_pairs
+    C = estimator.C
+    param_pairs = []
+    for n in n_estimators:
+        param_pairs.append((C/n, n))
+
+    storage = {'train_acc': [], 'test_acc': []}
+    for C, n_learners in param_pairs:
+        model = models.boosted_SVM(estimator, C=C, n_learners=n_learners)
+        results, _ = kfold_train_loop(data, model)
+        storage['train_acc'].append(results['train'])
+        storage['test_acc'].append(results['test'])
+
+    utils.plot_results(
+        storage['train_acc'], storage['test_acc'], param_pairs, experiment_name)
+
+    return(storage)
 
 
-def decision_tree(data, param_pairs):
-    """
-    Decision tree experiment
-    """
+def decision_tree(data, param_pairs, experiment_name):
+    """decision tree with and without adaboost"""
     decision_tree = models.decision_tree(data)
     _, single_model = kfold_train_loop(data, decision_tree)
     estimator = single_model.best_estimator_.named_steps['clf']
@@ -76,17 +88,24 @@ def decision_tree(data, param_pairs):
     return(storage)
 
 
-def mlp(data, param_pairs, experiment_name):
+def mlp(data, n_estimators, experiment_name):
     """mlp with and without adaboost"""
     # get the non-boosted model results
-    model = models.mlp(n_hid=param_pairs[0][0])
-    single_results, single_model = kfold_train_loop(data, model)
+    model = models.mlp()
+    _, single_model = kfold_train_loop(data, model)
+    estimator = single_model.best_estimator_.named_steps['clf']
+
+    # use optimal parameter C to generate param_pairs
+    n_hid = estimator.hidden_layer_sizes
+    param_pairs = []
+    for n in n_estimators:
+        param_pairs.append((int(np.floor(n_hid/n)), n))
 
     storage = {'train_acc': [], 'test_acc': []}
 
     # get the boosted model results using learned single model hyperparamaters
     for n_hid, n_learners in param_pairs:
-        model = models.boosted_mlp(single_model, n_hid=n_hid, n_learners=n_learners)
+        model = models.boosted_mlp(estimator, n_hid=n_hid, n_learners=n_learners)
         boosted_results, boosted_best_model = kfold_train_loop(data, model)
         storage['train_acc'].append(boosted_results['train'])
         storage['test_acc'].append(boosted_results['test'])

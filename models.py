@@ -65,17 +65,18 @@ def SVM():
     return(model)
 
 
-def boosted_SVM(model):
+def boosted_SVM(estimator, C=1, n_learners=10):
     """ baseline: linear classifier (without kernel)"""
-
     settings = {
-	    'clf__n_estimators':[25,30,35,40,45,50],
         'clf__learning_rate': SETTINGS['ada_lr']
     }
 
-    estimator = model.best_estimator_.named_steps['clf']
+    # set up this estimator's C parameter and adaboost
+    LOGGER.debug('setting up adaboost with C={}, n_estimators={}'.format(
+        C, n_learners))
+    estimator.C = C
     clf = AdaBoostClassifier(
-        base_estimator=estimator, algorithm='SAMME'
+        base_estimator=estimator, n_estimators=n_learners, algorithm='SAMME'
     )
 
     pipeline = Pipeline([
@@ -91,9 +92,8 @@ def boosted_SVM(model):
 
 
 def decision_tree(data):
-    """
-    Decision tree model with search
-    """
+    """decision tree model"""
+    LOGGER.debug('building decision tree model')
     n_features = data['X']['train'].shape[1]
     n_samples = data['X']['train'].shape[0]
     min_samples_split = [int(0.001*n_samples), int(0.1*n_samples)]
@@ -130,6 +130,8 @@ def random_forest(base_model, max_depth, n_learners):
     }
 
     # set up max_depth and n_learners (per-model parameters vs n in ensemble)
+    LOGGER.debug('setting up adaboost with max_depth={}, n_estimators={}'.format(
+        max_depth, n_learners))
     base_model.max_depth = max_depth
     booster = AdaBoostClassifier(base_estimator=base_model, n_estimators=n_learners)
 
@@ -145,18 +147,20 @@ def random_forest(base_model, max_depth, n_learners):
     return(model)
 
 
-def mlp(n_hid=100):
+def mlp():
     """build a not-boosted MLP classifier"""
+    LOGGER.debug('building mlp model')
+
     # alpha = l2 regularization, reciprocal == log-uniform distribution
     settings = {
         'clf__alpha': stats.reciprocal(10e-6, 10e-1),
-        'clf__learning_rate_init': stats.reciprocal(10e-6, 10e-1)
+        'clf__learning_rate_init': stats.reciprocal(10e-6, 10e-1),
+        'clf__hidden_layer_sizes': stats.randint(40, 1000)
     }
 
     clf =  MLPClassifier(
-        activation='relu', solver='sgd',  batch_size=32,
-        hidden_layer_sizes=n_hid, learning_rate='invscaling', momentum=0.9,
-        nesterovs_momentum=True, early_stopping=True
+        activation='relu', solver='sgd',  batch_size=32, early_stopping=True,
+        learning_rate='invscaling', momentum=0.9, nesterovs_momentum=True
     )
 
     pipeline = Pipeline([
@@ -172,14 +176,15 @@ def mlp(n_hid=100):
     return(model)
 
 
-def boosted_mlp(model, n_hid=10, n_learners=10):
+def boosted_mlp(estimator, n_hid=10, n_learners=10):
     """uses model learned by mlp_single for the model settings"""
     settings = {
         'clf__learning_rate': SETTINGS['ada_lr']
     }
 
-    # now set hidden layer size to 10
-    estimator = model.best_estimator_.named_steps['clf']
+    # set hidden layer size on estimator, and set up adaboost
+    LOGGER.debug('setting up adaboost with n_hid={}, n_estimators={}'.format(
+        n_hid, n_learners))
     estimator.hidden_layer_sizes = n_hid
     clf = AdaBoostClassifier(
         base_estimator=estimator, n_estimators=n_learners, algorithm='SAMME'

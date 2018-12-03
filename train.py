@@ -30,24 +30,25 @@ def main(args):
     wine_data = utils.load_wine(args.test)
     covt_data = utils.load_covertype(args.test)
 
-    if args.model == 'decision_tree':
+    if args.model not in ['decision_tree', 'mlp', 'svm', 'all']:
+        LOGGER.error('invalid experiment submitted -m {decision_tree, svm, mlp, all}')
+        sys.exit(1)
+
+    if args.model == 'decision_tree' or args.model == 'all':
         #param_pairs = [(6, 1), (5, 5), (4, 10), (3, 15), (2, 20), (1, 25)]
         param_pairs = [(6, 1), (5, 2), (4, 3), (3, 4), (2, 5), (1, 6)]
         results = exp.decision_tree(wine_data, param_pairs, 'tree-wine')
         results = exp.decision_tree(covt_data, param_pairs, 'tree-covt')
 
-    elif args.model == 'svm':
-        svm_pred, svm_model = exp.svm(wine_data, 'svm-wine')
-        svm_pred, svm_model = exp.svm(wine_data, 'svm-covt')
+    if args.model == 'svm' or args.model == 'all':
+        n_estimators = [1, 2, 4, 5, 10, 20]
+        svm_pred, svm_model = exp.svm(wine_data, n_estimators, 'svm-wine')
+        svm_pred, svm_model = exp.svm(covt_data, n_estimators, 'svm-covt')
 
-    elif args.model == 'mlp':
-        param_pairs = [(100, 1), (50, 2), (25, 4), (20, 5), (10, 10), (5, 20)]
-        results = exp.mlp(wine_data, param_pairs, 'mlp-wine')
-        results = exp.mlp(wine_data, param_pairs, 'mlp-covt')
-
-    else:
-        LOGGER.warning('invalid experiment submitted -m {decision_tree, svm, mlp}')
-        sys.exit(1)
+    if args.model == 'mlp' or args.model == 'all':
+        n_estimators = [1, 2, 4, 5, 10, 20]
+        results = exp.mlp(wine_data, n_estimators, 'mlp-wine')
+        results = exp.mlp(covt_data, n_estimators, 'mlp-covt')
 
 
 if __name__ == "__main__":
@@ -56,7 +57,6 @@ if __name__ == "__main__":
     argparser.add_argument("-v", "--verbose", action="store_true", help="increase output verbosity")
     argparser.add_argument("-t", "--test", action="store_true", help="training set size=500")
     argparser.add_argument("-m", "--model", help="which model?")
-    argparser.add_argument("-ada", "--adaboost", type=bool, default=False, help="Should adaboost be used?")
     args = argparser.parse_args()
 
     if args.verbose:
