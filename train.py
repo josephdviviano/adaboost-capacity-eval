@@ -40,7 +40,7 @@ def main(args):
 
     if args.model == 'tree' or args.model == 'all':
         experiment_name = '{}-{}'.format('tree', args.data)
-        n_estimators = [1, 2, 4, 5, 10, 20]
+        n_estimators = [1, 2, 4, 8, 16, 32, 64, 128, 256]
         estimator = exp.decision_tree(data, n_estimators, experiment_name, boosted=False)
         exp.decision_tree(data, n_estimators, experiment_name, estimator, boosted=True)
 
@@ -60,10 +60,14 @@ def main(args):
 if __name__ == "__main__":
 
     argparser = argparse.ArgumentParser()
-    argparser.add_argument("-v", "--verbose", action="store_true", help="increase output verbosity")
-    argparser.add_argument("-t", "--test", action="store_true", help="training set size=500")
-    argparser.add_argument("-m", "--model", help="which model?")
-    argparser.add_argument("-d", "--data", choices=['wine', 'covtype', 'covtype_balanced'], help="which data?")
+    argparser.add_argument("-v", "--verbose", action="store_true", 
+                            help="increase output verbosity")
+    argparser.add_argument("-t", "--test", action="store_true", 
+                            help="training set size=500")
+    argparser.add_argument("-m", "--model", choices=['tree', 'svm', 'mlp'],
+                            help="which model?")
+    argparser.add_argument("-d", "--data", choices=['wine', 'covtype', 'covtype_balanced'], 
+                            help="which data?")
     args = argparser.parse_args()
 
     if args.verbose:

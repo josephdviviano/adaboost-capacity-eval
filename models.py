@@ -31,7 +31,7 @@ VERB_LEVEL = 0
 
 # global settings for all cross-validation runs
 SETTINGS = {
-    'n_cv': 50,
+    'n_cv': 100,
     'n_folds': 10,
     'ada_lr': stats.uniform(10e-5, 10e-1),
     'cv_score': 'f1_macro'

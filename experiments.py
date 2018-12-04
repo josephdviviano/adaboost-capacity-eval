@@ -51,7 +51,7 @@ def svm(data, n_estimators, experiment_name, boosted=False):
 
     # use optimal parameter C to generate param_pairs
     C = estimator.C
-    param_pairs = [(C/n, n) for n in n_estimators] if boosted else [(C/n, 1) for n in n_estimators] 
+    param_pairs = [(C/n, (n if boosted else 1)) for n in n_estimators] 
 
     storage = {'train_acc': [], 'test_acc': [], 'train_f1': [], 'test_f1': []}
     for C, n_learners in param_pairs:
@@ -62,14 +62,22 @@ def svm(data, n_estimators, experiment_name, boosted=False):
         storage['train_f1'].append(results['train']['f1'])
         storage['test_f1'].append(results['test']['f1'])
 
+    experiment_name = ('{}-{}'.format(experiment_name, ('boosted' if boosted else 'not-boosted')))
+
     utils.plot_results(
-        storage['train_acc'], storage['test_acc'], param_pairs,
-        '{}_accuracy'.format(experiment_name), 'Accuracy'
+        storage['train_acc'], 
+        storage['test_acc'], 
+        param_pairs,
+        exp_name='{}_accuracy'.format(experiment_name), 
+        yaxis='Accuracy'
     )
 
     utils.plot_results(
-        storage['train_f1'], storage['test_f1'], param_pairs,
-        '{}_f1'.format(experiment_name), 'F1'
+        storage['train_f1'], 
+        storage['test_f1'], 
+        param_pairs,
+        exp_name='{}_f1'.format(experiment_name), 
+        yaxis='F1'
     )
 
     return(storage)
@@ -90,8 +98,10 @@ def decision_tree(data, n_estimators, experiment_name, estimator=None, boosted=F
     LOGGER.info('min_impurity_decrease: {}'.format(estimator.min_impurity_decrease))
 
     init_max_depth = estimator.max_depth
-    max_depths = list(range(init_max_depth+len(n_estimators), init_max_depth, -1))
-    param_pairs = list(zip(max_depths, n_estimators)) if boosted else list(zip(max_depths, [1]*len(n_estimators)))
+    max_depths = list(range(init_max_depth+len(n_estimators)-1, init_max_depth-1, -1))
+    param_pairs = list(
+        (zip(max_depths, n_estimators) if boosted else zip(max_depths, [1]*len(n_estimators)))
+    )
 
     storage = {'train_acc': [], 'test_acc': [], 'train_f1': [], 'test_f1': []}
     for max_depth, n_learners in param_pairs:
@@ -102,6 +112,8 @@ def decision_tree(data, n_estimators, experiment_name, estimator=None, boosted=F
         storage['train_f1'].append(results['train']['f1'])
         storage['test_f1'].append(results['test']['f1'])
 
+    experiment_name = ('{}-{}'.format(experiment_name, ('boosted' if boosted else 'not-boosted')))
+
     utils.plot_results(
         storage['train_acc'], 
         storage['test_acc'], param_pairs,
@@ -109,9 +121,6 @@ def decision_tree(data, n_estimators, experiment_name, estimator=None, boosted=F
         yaxis='Accuracy'
     )
 
-    experiment_name = (
-        '{}-{}'.format(experiment_name, 'boosted') if boosted else '{}-{}'.format(experiment_name, 'not-boosted')
-    )
     utils.plot_results(
         storage['train_f1'], 
         storage['test_f1'], 
@@ -132,7 +141,9 @@ def mlp(data, n_estimators, experiment_name, boosted=False):
     # use optimal parameter C to generate param_pairs
     hidden_size = estimator.hidden_layer_sizes
     hidden_sizes = [int(np.floor(hidden_size / n)) for n in n_estimators]
-    param_pairs = list(zip(hidden_sizes, n_estimators)) if boosted else list(zip(hidden_sizes, [1] * len(n_estimators))) 
+    param_pairs = list(
+        zip(hidden_sizes, (n_estimators if boosted else [1] * len(n_estimators)))
+    )
 
     storage = {'train_acc': [], 'test_acc': [], 'train_f1': [], 'test_f1': []}
     for n_hid, n_learners in param_pairs:
@@ -143,15 +154,22 @@ def mlp(data, n_estimators, experiment_name, boosted=False):
         storage['train_f1'].append(boosted_best_model['train']['f1'])
         storage['test_f1'].append(boosted_best_model['test']['f1'])
 
+    experiment_name = ('{}-{}'.format(experiment_name, ('boosted' if boosted else 'not-boosted')))
+
     utils.plot_results(
-        storage['train_acc'], storage['test_acc'], param_pairs,
-        '{}_accuracy'.format(experiment_name), 'Accuracy'
+        storage['train_acc'], 
+        storage['test_acc'], 
+        param_pairs,
+        exp_name='{}_accuracy'.format(experiment_name), 
+        yaxis='Accuracy'
     )
 
-    experiment_name = '{}-{}'.format(experiment_name, 'boosted') if boosted else experiment_name
     utils.plot_results(
-        storage['train_f1'], storage['test_f1'], param_pairs,
-        '{}_f1'.format(experiment_name), 'F1'
+        storage['train_f1'], 
+        storage['test_f1'], 
+        param_pairs,
+        exp_name='{}_f1'.format(experiment_name), 
+        yaxis='F1'
     )
 
     return(storage)
