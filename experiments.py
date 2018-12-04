@@ -42,12 +42,13 @@ def kfold_train_loop(data, model):
     return(results, model)
 
 
-def svm(data, n_estimators, experiment_name, boosted=False):
+def svm(data, n_estimators, experiment_name, estimator=None, boosted=False):
     """linear svm with and without adaboost"""
     # get the non-boosted model results
-    model = models.SVM()
-    _, single_best_model = kfold_train_loop(data, model)
-    estimator = single_best_model.best_estimator_.named_steps['clf']
+    if not estimator:
+        model = models.SVM()
+        _, single_best_model = kfold_train_loop(data, model)
+        estimator = single_best_model.best_estimator_.named_steps['clf']
 
     # use optimal parameter C to generate param_pairs
     C = estimator.C
@@ -80,7 +81,7 @@ def svm(data, n_estimators, experiment_name, boosted=False):
         yaxis='F1'
     )
 
-    return(storage)
+    return estimator, storage
 
 
 def decision_tree(data, n_estimators, experiment_name, estimator=None, boosted=False):
@@ -128,15 +129,16 @@ def decision_tree(data, n_estimators, experiment_name, estimator=None, boosted=F
         exp_name='{}_f1'.format(experiment_name),
         yaxis='F1')
 
-    return estimator
+    return estimator, storage
 
 
-def mlp(data, n_estimators, experiment_name, boosted=False):
+def mlp(data, n_estimators, experiment_name, estimator=None, boosted=False):
     """mlp with and without adaboost"""
     # get the non-boosted model results
-    model = models.mlp()
-    _, single_model = kfold_train_loop(data, model)
-    estimator = single_model.best_estimator_.named_steps['clf']
+    if not estimator:
+        model = models.mlp()
+        _, single_model = kfold_train_loop(data, model)
+        estimator = single_model.best_estimator_.named_steps['clf']
 
     # use optimal parameter C to generate param_pairs
     hidden_size = estimator.hidden_layer_sizes
@@ -172,6 +174,6 @@ def mlp(data, n_estimators, experiment_name, boosted=False):
         yaxis='F1'
     )
 
-    return(storage)
+    return(estimator, storage)
 
 

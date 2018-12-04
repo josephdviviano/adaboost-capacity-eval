@@ -41,20 +41,20 @@ def main(args):
     if args.model == 'tree' or args.model == 'all':
         experiment_name = '{}-{}'.format('tree', args.data)
         n_estimators = [1, 2, 4, 8, 16, 32, 64, 128, 256]
-        estimator = exp.decision_tree(data, n_estimators, experiment_name, boosted=False)
-        exp.decision_tree(data, n_estimators, experiment_name, estimator, boosted=True)
+        estimator, result = exp.decision_tree(data, n_estimators, experiment_name, boosted=False)
+        estimator, result = exp.decision_tree(data, n_estimators, experiment_name, estimator, boosted=True)
 
     if args.model == 'svm' or args.model == 'all':
         experiment_name = '{}-{}'.format('svm', args.data)
         n_estimators = [1, 2, 4, 5, 10, 20]
-        svm_pred, svm_model = exp.svm(data, n_estimators, experiment_name, boosted=False)
-        svm_pred, svm_model = exp.svm(data, n_estimators, experiment_name, boosted=True)
+        estimator, result = exp.svm(data, n_estimators, experiment_name, boosted=False)
+        estimator, result = exp.svm(data, n_estimators, experiment_name, estimator, boosted=True)
 
     if args.model == 'mlp' or args.model == 'all':
         experiment_name = '{}-{}'.format('mlp', args.data)
         n_estimators = [1, 2, 4, 5, 10, 20]
-        results = exp.mlp(data, n_estimators, experiment_name, boosted=False)
-        results = exp.mlp(data, n_estimators, experiment_name, boosted=True)
+        estimator, result = exp.mlp(data, n_estimators, experiment_name, boosted=False)
+        estimator, result = exp.mlp(data, n_estimators, experiment_name, estimator, boosted=True)
 
 
 if __name__ == "__main__":
