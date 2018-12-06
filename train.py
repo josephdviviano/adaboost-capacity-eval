@@ -43,6 +43,13 @@ def main(args):
         n_estimators = [1, 2, 4, 8, 16, 32, 64, 128, 256]
         estimator, result = exp.decision_tree(data, n_estimators, experiment_name, boosted=False)
         estimator, result = exp.decision_tree(data, n_estimators, experiment_name, estimator, boosted=True)
+    
+    if args.model == 'lr' or args.model == 'all':
+        experiment_name = '{}-{}'.format('lr', args.data)
+        n_estimators = [1, 2, 4, 5, 10, 20]
+        estimator, result = exp.svm(data, n_estimators, experiment_name, boosted=False)
+        estimator, result = exp.svm(data, n_estimators, experiment_name, estimator, boosted=True)
+
 
     if args.model == 'svm' or args.model == 'all':
         experiment_name = '{}-{}'.format('svm', args.data)
@@ -64,7 +71,7 @@ if __name__ == "__main__":
                             help="increase output verbosity")
     argparser.add_argument("-t", "--test", action="store_true", 
                             help="training set size=500")
-    argparser.add_argument("-m", "--model", choices=['tree', 'svm', 'mlp'],
+    argparser.add_argument("-m", "--model", choices=['tree', 'lr' ,'svm', 'mlp'],
                             help="which model?")
     argparser.add_argument("-d", "--data", choices=['wine', 'covtype', 'covtype_balanced'], 
                             help="which data?")
