@@ -44,7 +44,7 @@ def SVM():
 
     # hyperparameters to search for randomized cross validation
     settings = {
-        'clf__tol': stats.uniform(10e-3, 10e-1),
+        'clf__tol': [1e-4],
         'clf__C': stats.uniform(10e-3, 1)
     }
 
