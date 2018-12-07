@@ -38,23 +38,25 @@ SETTINGS = {
 }
 
 
-def SVM():
-    """ baseline: linear classifier (without kernel)"""
-    LOGGER.debug('building SVM model')
 
+def logistic_regression(data):
+    """baseline: linear classifier"""
+    LOGGER.debug('building logistic regression model')
     # hyperparameters to search for randomized cross validation
     settings = {
-        'clf__tol': stats.uniform(10e-3, 10e-1),
-        'clf__C': stats.uniform(10e-3, 1)
+        'dim__n_components': stats.randint(10, 400),
+        'clf__tol': stats.uniform(10e-5, 10e-1),
+        'clf__C': stats.uniform(10e-3, 10),
+        'clf__penalty': ['l1', 'l2']
     }
 
     # model we will train in our pipeline
-    clf = SVC(kernel='linear', max_iter=2e3)
+    clf = LogisticRegression(solver='saga', multi_class='ovr', max_iter=100)
 
     # pipeline runs preprocessing and model during every CV loop
     pipe = Pipeline([
         ('pre', StandardScaler()),
-        ('clf', clf),
+        ('clf', clf)
     ])
 
     # this will learn our best parameters for the final model
@@ -65,16 +67,15 @@ def SVM():
     return(model)
 
 
-def boosted_SVM(estimator, C=1, n_learners=10):
-    """ baseline: linear classifier (without kernel)"""
+def boosted_LR(estimator, n_learners=10):
+    """ baseline: linear classifier"""
     settings = {
         'clf__learning_rate': SETTINGS['ada_lr']
     }
 
     # set up this estimator's C parameter and adaboost
-    LOGGER.debug('setting up adaboost with C={}, n_estimators={}'.format(
-        C, n_learners))
-    estimator.C = C
+    LOGGER.debug('setting up adaboost with n_estimators={}'.format(n_learners))
+
     clf = AdaBoostClassifier(
         base_estimator=estimator, n_estimators=n_learners, algorithm='SAMME'
     )
