@@ -108,7 +108,7 @@ def load_covertype(test_mode=False, test_pct=0.1, balanced=False):
     ##       https://scikit-learn.org/dev/auto_examples/compose/plot_column_transformer_mixed_types.html#sphx-glr-auto-examples-compose-plot-column-transformer-mixed-types-py
     path = 'data/covtype.csv' if not balanced else 'data/covtype_balanced.csv'
     data = np.genfromtxt(path, delimiter=',')
-
+    data = data[:int(.05*len(data)),:]
     # shuffle data as we extract it to X and y
     idx = np.arange(len(data))
     np.random.shuffle(idx)
