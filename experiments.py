@@ -41,22 +41,19 @@ def kfold_train_loop(data, model):
 
     return(results, model)
 
-
-def svm(data, n_estimators, experiment_name, estimator=None, boosted=False):
-    """linear svm with and without adaboost"""
+def logistic_regression(data, n_estimators, experiment_name, estimator=None, boosted=False):
+    """Logistic regression with and without adaboost"""
     # get the non-boosted model results
     if not estimator:
-        model = models.SVM()
+        model = models.logistic_regression(data)
         _, single_best_model = kfold_train_loop(data, model)
         estimator = single_best_model.best_estimator_.named_steps['clf']
 
-    # use optimal parameter C to generate param_pairs
-    C = estimator.C
-    param_pairs = [(C/n, (n if boosted else 1)) for n in n_estimators] 
+    param_pairs = [((n if boosted else 1)) for n in n_estimators] 
 
     storage = {'train_acc': [], 'test_acc': [], 'train_f1': [], 'test_f1': []}
-    for C, n_learners in param_pairs:
-        model = models.boosted_SVM(estimator, C=C, n_learners=n_learners)
+    for n_learners in param_pairs:
+        model = models.boosted_LR(estimator, n_learners=n_learners)
         results, _ = kfold_train_loop(data, model)
         storage['train_acc'].append(results['train']['accuracy'])
         storage['test_acc'].append(results['test']['accuracy'])
@@ -78,6 +75,50 @@ def svm(data, n_estimators, experiment_name, estimator=None, boosted=False):
         storage['test_f1'], 
         param_pairs,
         exp_name='{}_f1'.format(experiment_name), 
+        yaxis='F1'
+    )
+
+    return estimator, storage
+
+
+
+
+def svm(data, n_estimators, experiment_name, estimator=None, boosted=False):
+    """linear svm with and without adaboost"""
+    # get the non-boosted model results
+    if not estimator:
+        model = models.SVM()
+        _, single_best_model = kfold_train_loop(data, model)
+        estimator = single_best_model.best_estimator_.named_steps['clf']
+
+    # use optimal parameter C to generate param_pairs
+    C = estimator.C
+    param_pairs = [(C/n, (n if boosted else 1)) for n in n_estimators]
+
+    storage = {'train_acc': [], 'test_acc': [], 'train_f1': [], 'test_f1': []}
+    for C, n_learners in param_pairs:
+        model = models.boosted_SVM(estimator, C=C, n_learners=n_learners)
+        results, _ = kfold_train_loop(data, model)
+        storage['train_acc'].append(results['train']['accuracy'])
+        storage['test_acc'].append(results['test']['accuracy'])
+        storage['train_f1'].append(results['train']['f1'])
+        storage['test_f1'].append(results['test']['f1'])
+
+    experiment_name = ('{}-{}'.format(experiment_name, ('boosted' if boosted else 'not-boosted')))
+
+    utils.plot_results(
+        storage['train_acc'],
+        storage['test_acc'],
+        param_pairs,
+        exp_name='{}_accuracy'.format(experiment_name),
+        yaxis='Accuracy'
+    )
+
+    utils.plot_results(
+        storage['train_f1'],
+        storage['test_f1'],
+        param_pairs,
+        exp_name='{}_f1'.format(experiment_name),
         yaxis='F1'
     )
 
@@ -117,15 +158,15 @@ def decision_tree(data, n_estimators, experiment_name, estimator=None, boosted=F
     experiment_name = ('{}-{}'.format(experiment_name, ('boosted' if boosted else 'not-boosted')))
 
     utils.plot_results(
-        storage['train_acc'], 
+        storage['train_acc'],
         storage['test_acc'], param_pairs,
         exp_name='{}_accuracy'.format(experiment_name),
         yaxis='Accuracy'
     )
 
     utils.plot_results(
-        storage['train_f1'], 
-        storage['test_f1'], 
+        storage['train_f1'],
+        storage['test_f1'],
         param_pairs,
         exp_name='{}_f1'.format(experiment_name),
         yaxis='F1')
@@ -152,26 +193,26 @@ def mlp(data, n_estimators, experiment_name, estimator=None, boosted=False):
     for n_hid, n_learners in param_pairs:
         model = models.boosted_mlp(estimator, n_hid=n_hid, n_learners=n_learners)
         boosted_results, boosted_best_model = kfold_train_loop(data, model)
-        storage['train_acc'].append(boosted_best_model['train']['accuracy'])
-        storage['test_acc'].append(boosted_best_model['test']['accuracy'])
-        storage['train_f1'].append(boosted_best_model['train']['f1'])
-        storage['test_f1'].append(boosted_best_model['test']['f1'])
+        storage['train_acc'].append(boosted_results['train']['accuracy'])
+        storage['test_acc'].append(boosted_results['test']['accuracy'])
+        storage['train_f1'].append(boosted_results['train']['f1'])
+        storage['test_f1'].append(boosted_results['test']['f1'])
 
     experiment_name = ('{}-{}'.format(experiment_name, ('boosted' if boosted else 'not-boosted')))
 
     utils.plot_results(
-        storage['train_acc'], 
-        storage['test_acc'], 
+        storage['train_acc'],
+        storage['test_acc'],
         param_pairs,
-        exp_name='{}_accuracy'.format(experiment_name), 
+        exp_name='{}_accuracy'.format(experiment_name),
         yaxis='Accuracy'
     )
 
     utils.plot_results(
-        storage['train_f1'], 
-        storage['test_f1'], 
+        storage['train_f1'],
+        storage['test_f1'],
         param_pairs,
-        exp_name='{}_f1'.format(experiment_name), 
+        exp_name='{}_f1'.format(experiment_name),
         yaxis='F1'
     )
 

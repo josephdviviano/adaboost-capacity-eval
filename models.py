@@ -38,23 +38,24 @@ SETTINGS = {
 }
 
 
-def SVM():
-    """ baseline: linear classifier (without kernel)"""
-    LOGGER.debug('building SVM model')
 
+def logistic_regression(data):
+    """baseline: linear classifier"""
+    LOGGER.debug('building logistic regression model')
     # hyperparameters to search for randomized cross validation
     settings = {
-        'clf__tol': stats.uniform(10e-3, 10e-1),
-        'clf__C': stats.uniform(10e-3, 1)
+        'clf__tol': [1e-4],
+        'clf__C': stats.uniform(10e-3, 10), 
+        'clf__penalty': ['l1', 'l2']
     }
 
     # model we will train in our pipeline
-    clf = SVC(kernel='linear', max_iter=5e3)
+    clf = LogisticRegression(solver='saga', multi_class='ovr', max_iter=100)
 
     # pipeline runs preprocessing and model during every CV loop
     pipe = Pipeline([
         ('pre', StandardScaler()),
-        ('clf', clf),
+        ('clf', clf)
     ])
 
     # this will learn our best parameters for the final model
@@ -64,17 +65,15 @@ def SVM():
 
     return(model)
 
-
-def boosted_SVM(estimator, C=1, n_learners=10):
-    """ baseline: linear classifier (without kernel)"""
+def boosted_LR(estimator, n_learners=10):
+    """ baseline: linear classifier"""
     settings = {
         'clf__learning_rate': SETTINGS['ada_lr']
     }
 
     # set up this estimator's C parameter and adaboost
-    LOGGER.debug('setting up adaboost with C={}, n_estimators={}'.format(
-        C, n_learners))
-    estimator.C = C
+    LOGGER.debug('setting up adaboost with n_estimators={}'.format(n_learners))
+
     clf = AdaBoostClassifier(
         base_estimator=estimator, n_estimators=n_learners, algorithm='SAMME'
     )
@@ -106,7 +105,7 @@ def decision_tree(data):
     LOGGER.info('min_samples_leaf: {}'.format(min_samples_leaf))
 
     settings = {
-        'clf__max_depth': stats.randint(1, n_features),
+        'clf__max_depth': stats.randint(11, 20),
         'clf__min_samples_split': stats.randint(*min_samples_split),
         'clf__min_samples_leaf': stats.randint(*min_samples_leaf),
         'clf__max_features': stats.randint(1, n_features),
@@ -158,7 +157,7 @@ def mlp():
     settings = {
         'clf__alpha': stats.reciprocal(10e-6, 10e-1),
         'clf__learning_rate_init': stats.reciprocal(10e-6, 10e-1),
-        'clf__hidden_layer_sizes': stats.randint(40, 1000)
+        'clf__hidden_layer_sizes': stats.randint(40, 200)
     }
 
     clf =  MLPClassifier(
