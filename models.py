@@ -44,9 +44,8 @@ def logistic_regression(data):
     LOGGER.debug('building logistic regression model')
     # hyperparameters to search for randomized cross validation
     settings = {
-        'dim__n_components': stats.randint(10, 400),
-        'clf__tol': stats.uniform(10e-5, 10e-1),
-        'clf__C': stats.uniform(10e-3, 10),
+        'clf__tol': [1e-4],
+        'clf__C': stats.uniform(10e-3, 10), 
         'clf__penalty': ['l1', 'l2']
     }
 
@@ -60,12 +59,11 @@ def logistic_regression(data):
     ])
 
     # this will learn our best parameters for the final model
-    model = RandomizedSearchCV(pipe, settings, n_jobs=-1, verbose=VERB_LEVEL,
+    model = RandomizedSearchCV(pipe, settings, n_jobs=4, verbose=VERB_LEVEL,
         n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_folds'], scoring=SETTINGS['cv_score']
     )
 
     return(model)
-
 
 def boosted_LR(estimator, n_learners=10):
     """ baseline: linear classifier"""
