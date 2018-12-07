@@ -49,7 +49,7 @@ def SVM():
     }
 
     # model we will train in our pipeline
-    clf = SVC(kernel='linear', max_iter=5e3)
+    clf = SVC(kernel='linear', max_iter=2e3)
 
     # pipeline runs preprocessing and model during every CV loop
     pipe = Pipeline([
