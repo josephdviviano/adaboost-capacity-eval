@@ -142,7 +142,7 @@ def decision_tree(data, n_estimators, experiment_name, estimator=None, boosted=F
     init_max_depth = estimator.max_depth
     # subtract one depth from each tree, as we add a booster, because
     # in a balanced tree the leaves constuitute 1/2 of the nodes
-    max_depths = list(range(init_max_depth-1, init_max_depth-len(n_estimators)-1, -1))
+    max_depths = list(range(init_max_depth, init_max_depth-len(n_estimators)-1, -1))
     param_pairs = list(
         (zip(max_depths, n_estimators) if boosted else zip(max_depths, [1]*len(n_estimators)))
     )
