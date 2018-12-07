@@ -107,7 +107,7 @@ def decision_tree(data):
     LOGGER.info('min_samples_leaf: {}'.format(min_samples_leaf))
 
     settings = {
-        'clf__max_depth': stats.randint(1, n_features),
+        'clf__max_depth': stats.randint(1, 20),
         'clf__min_samples_split': stats.randint(*min_samples_split),
         'clf__min_samples_leaf': stats.randint(*min_samples_leaf),
         'clf__max_features': stats.randint(1, n_features),

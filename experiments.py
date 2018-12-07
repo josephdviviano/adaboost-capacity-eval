@@ -49,7 +49,7 @@ def logistic_regression(data, n_estimators, experiment_name, estimator=None, boo
         _, single_best_model = kfold_train_loop(data, model)
         estimator = single_best_model.best_estimator_.named_steps['clf']
 
-    param_pairs = [((n if boosted else 1)) for n in n_estimators] 
+    param_pairs = [((n if boosted else 1)) for n in n_estimators]
 
     storage = {'train_acc': [], 'test_acc': [], 'train_f1': [], 'test_f1': []}
     for n_learners in param_pairs:
@@ -63,18 +63,18 @@ def logistic_regression(data, n_estimators, experiment_name, estimator=None, boo
     experiment_name = ('{}-{}'.format(experiment_name, ('boosted' if boosted else 'not-boosted')))
 
     utils.plot_results(
-        storage['train_acc'], 
-        storage['test_acc'], 
+        storage['train_acc'],
+        storage['test_acc'],
         param_pairs,
-        exp_name='{}_accuracy'.format(experiment_name), 
+        exp_name='{}_accuracy'.format(experiment_name),
         yaxis='Accuracy'
     )
 
     utils.plot_results(
-        storage['train_f1'], 
-        storage['test_f1'], 
+        storage['train_f1'],
+        storage['test_f1'],
         param_pairs,
-        exp_name='{}_f1'.format(experiment_name), 
+        exp_name='{}_f1'.format(experiment_name),
         yaxis='F1'
     )
 
@@ -140,7 +140,9 @@ def decision_tree(data, n_estimators, experiment_name, estimator=None, boosted=F
     LOGGER.info('min_impurity_decrease: {}'.format(estimator.min_impurity_decrease))
 
     init_max_depth = estimator.max_depth
-    max_depths = list(range(init_max_depth+len(n_estimators)-1, init_max_depth-1, -1))
+    # subtract one depth from each tree, as we add a booster, because
+    # in a balanced tree the leaves constuitute 1/2 of the nodes
+    max_depths = list(range(init_max_depth-1, init_max_depth-len(n_estimators)-1, -1))
     param_pairs = list(
         (zip(max_depths, n_estimators) if boosted else zip(max_depths, [1]*len(n_estimators)))
     )
