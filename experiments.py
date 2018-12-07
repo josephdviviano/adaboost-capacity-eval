@@ -45,11 +45,11 @@ def logistic_regression(data, n_estimators, experiment_name, estimator=None, boo
     """Logistic regression with and without adaboost"""
     # get the non-boosted model results
     if not estimator:
-        model = models.logistic_regression()
+        model = models.logistic_regression(data)
         _, single_best_model = kfold_train_loop(data, model)
         estimator = single_best_model.best_estimator_.named_steps['clf']
 
-    param_pairs = [((n if boosted else 1)) for n in n_estimators]
+    param_pairs = [((n if boosted else 1)) for n in n_estimators] 
 
     storage = {'train_acc': [], 'test_acc': [], 'train_f1': [], 'test_f1': []}
     for n_learners in param_pairs:
@@ -63,18 +63,18 @@ def logistic_regression(data, n_estimators, experiment_name, estimator=None, boo
     experiment_name = ('{}-{}'.format(experiment_name, ('boosted' if boosted else 'not-boosted')))
 
     utils.plot_results(
-        storage['train_acc'],
-        storage['test_acc'],
+        storage['train_acc'], 
+        storage['test_acc'], 
         param_pairs,
-        exp_name='{}_accuracy'.format(experiment_name),
+        exp_name='{}_accuracy'.format(experiment_name), 
         yaxis='Accuracy'
     )
 
     utils.plot_results(
-        storage['train_f1'],
-        storage['test_f1'],
+        storage['train_f1'], 
+        storage['test_f1'], 
         param_pairs,
-        exp_name='{}_f1'.format(experiment_name),
+        exp_name='{}_f1'.format(experiment_name), 
         yaxis='F1'
     )
 
