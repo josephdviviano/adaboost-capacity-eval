@@ -159,7 +159,7 @@ def mlp():
     settings = {
         'clf__alpha': stats.reciprocal(10e-6, 10e-1),
         'clf__learning_rate_init': stats.reciprocal(10e-6, 10e-1),
-        'clf__hidden_layer_sizes': stats.randint(40, 1000)
+        'clf__hidden_layer_sizes': stats.randint(40, 200)
     }
 
     clf =  MLPClassifier(
