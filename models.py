@@ -59,7 +59,7 @@ def logistic_regression(data):
     ])
 
     # this will learn our best parameters for the final model
-    model = RandomizedSearchCV(pipe, settings, n_jobs=4, verbose=VERB_LEVEL,
+    model = RandomizedSearchCV(pipe, settings, n_jobs=-1, verbose=VERB_LEVEL,
         n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_folds'], scoring=SETTINGS['cv_score']
     )
 
