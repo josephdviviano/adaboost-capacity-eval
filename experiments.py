@@ -4,6 +4,7 @@ holds different experiment functions (import and run these in train.py)
 from copy import copy
 from scipy import stats
 from sklearn.metrics import accuracy_score, f1_score
+from sklearn.base import clone
 import logging
 import matplotlib.pyplot as plt
 import models
@@ -140,15 +141,16 @@ def decision_tree(data, n_estimators, experiment_name, estimator=None, boosted=F
     LOGGER.info('min_impurity_decrease: {}'.format(estimator.min_impurity_decrease))
 
     init_max_depth = estimator.max_depth
-    max_depths = list(range(init_max_depth, init_max_depth-len(n_estimators)+1, -1))
+    max_depths = list(range(init_max_depth, init_max_depth-len(n_estimators), -1))
     param_pairs = list(
         (zip(max_depths, n_estimators) if boosted else zip(max_depths, [1]*len(n_estimators)))
     )
+    param_pairs = [pair for pair in param_pairs if pair[0] > 0]
     LOGGER.info('parameter pairs:\n{}'.format(param_pairs))
 
     storage = {'train_acc': [], 'test_acc': [], 'train_f1': [], 'test_f1': []}
     for max_depth, n_learners in param_pairs:
-        model = models.random_forest(estimator, max_depth=max_depth, n_learners=n_learners)
+        model = models.random_forest(clone(estimator), max_depth=max_depth, n_learners=n_learners)
         results, _ = kfold_train_loop(data, model)
         storage['train_acc'].append(results['train']['accuracy'])
         storage['test_acc'].append(results['test']['accuracy'])
