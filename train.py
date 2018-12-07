@@ -26,8 +26,8 @@ def main(args):
     log_hdl.setFormatter(logging.Formatter('%(message)s'))
     LOGGER.addHandler(log_hdl)
 
-    if args.model not in ['tree', 'mlp', 'svm', 'all']:
-        LOGGER.error('invalid experiment submitted -m {decision_tree, svm, mlp, all}')
+    if args.model not in ['tree', 'mlp', 'svm','lr', 'all']:
+        LOGGER.error('invalid experiment submitted -m {decision_tree, svm, lr, mlp, all}')
         sys.exit(1)
 
     # load our the datasets
@@ -47,8 +47,8 @@ def main(args):
     if args.model == 'lr' or args.model == 'all':
         experiment_name = '{}-{}'.format('lr', args.data)
         n_estimators = [1, 2, 4, 5, 10, 20]
-        estimator, result = exp.svm(data, n_estimators, experiment_name, boosted=False)
-        estimator, result = exp.svm(data, n_estimators, experiment_name, estimator, boosted=True)
+        estimator, result = exp.logistic_regression(data, n_estimators, experiment_name, boosted=False)
+        estimator, result = exp.logistic_regression(data, n_estimators, experiment_name, estimator, boosted=True)
 
 
     if args.model == 'svm' or args.model == 'all':
