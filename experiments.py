@@ -99,10 +99,11 @@ def decision_tree(data, n_estimators, experiment_name, estimator=None, boosted=F
     LOGGER.info('min_impurity_decrease: {}'.format(estimator.min_impurity_decrease))
 
     init_max_depth = estimator.max_depth
-    max_depths = list(range(init_max_depth+len(n_estimators)-1, init_max_depth-1, -1))
+    max_depths = list(range(init_max_depth, init_max_depth-len(n_estimators)+1, -1))
     param_pairs = list(
         (zip(max_depths, n_estimators) if boosted else zip(max_depths, [1]*len(n_estimators)))
     )
+    LOGGER.info('parameter pairs:\n{}'.format(param_pairs))
 
     storage = {'train_acc': [], 'test_acc': [], 'train_f1': [], 'test_f1': []}
     for max_depth, n_learners in param_pairs:
