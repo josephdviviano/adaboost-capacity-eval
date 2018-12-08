@@ -44,8 +44,7 @@ def logistic_regression(data):
     LOGGER.debug('building logistic regression model')
     # hyperparameters to search for randomized cross validation
     settings = {
-        'clf__tol': [1e-4],
-        'clf__C': stats.uniform(10e-3, 10), 
+        'clf__C': stats.uniform(10e-3, 10),
         'clf__penalty': ['l1', 'l2']
     }
 
@@ -64,6 +63,7 @@ def logistic_regression(data):
     )
 
     return(model)
+
 
 def boosted_LR(estimator, n_learners=10):
     """ baseline: linear classifier"""
@@ -120,7 +120,7 @@ def decision_tree(data):
     ])
 
     model = RandomizedSearchCV(pipeline, settings, n_jobs=-1, verbose=VERB_LEVEL,
-        n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_folds'], scoring=SETTINGS['cv_score']
+        n_iter=SETTINGS['n_cv'], cv=SETTINGS['n_folds'], scoring=SETTINGS['cv_score'],
     )
 
     return model
@@ -157,7 +157,7 @@ def mlp():
     settings = {
         'clf__alpha': stats.reciprocal(10e-6, 10e-1),
         'clf__learning_rate_init': stats.reciprocal(10e-6, 10e-1),
-        'clf__hidden_layer_sizes': stats.randint(40, 200)
+        'clf__hidden_layer_sizes': stats.randint(100, 300)
     }
 
     clf =  MLPClassifier(
