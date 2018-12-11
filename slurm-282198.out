@@ -1,0 +1,39 @@
+
+======== GPU REPORT ========
+
+==============NVSMI LOG==============
+
+Timestamp                           : Sun Dec  9 06:39:52 2018
+Driver Version                      : 396.37
+
+Attached GPUs                       : 2
+GPU 00000000:05:00.0
+    Accounting Mode                 : Enabled
+    Accounting Mode Buffer Size     : 4000
+    Accounted Processes             : None
+
+GPU 00000000:06:00.0
+    Accounting Mode                 : Enabled
+    Accounting Mode Buffer Size     : 4000
+    Accounted Processes             : None
+
+Sun Dec  9 06:39:52 2018       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 396.37                 Driver Version: 396.37                    |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|===============================+======================+======================|
+|   0  GeForce GTX 1050    Off  | 00000000:05:00.0  On |                  N/A |
+| 30%   48C    P8    N/A /  75W |     39MiB /  1999MiB |      0%      Default |
++-------------------------------+----------------------+----------------------+
+|   1  TITAN X (Pascal)    Off  | 00000000:06:00.0 Off |                  N/A |
+| 36%   62C    P8    20W / 250W |      2MiB / 12196MiB |      0%      Default |
++-------------------------------+----------------------+----------------------+
+                                                                               
++-----------------------------------------------------------------------------+
+| Processes:                                                       GPU Memory |
+|  GPU       PID   Type   Process name                             Usage      |
+|=============================================================================|
+|    0      1380      G   /usr/bin/X                                    37MiB |
++-----------------------------------------------------------------------------+

@@ -1,0 +1,57 @@
+
+======== GPU REPORT ========
+
+==============NVSMI LOG==============
+
+Timestamp                           : Mon Dec 10 07:18:52 2018
+Driver Version                      : 396.37
+
+Attached GPUs                       : 2
+GPU 00000000:05:00.0
+    Accounting Mode                 : Enabled
+    Accounting Mode Buffer Size     : 4000
+    Accounted Processes             : None
+
+GPU 00000000:09:00.0
+    Accounting Mode                 : Enabled
+    Accounting Mode Buffer Size     : 4000
+    Accounted Processes
+        Process ID                  : 16919
+            GPU Utilization         : 0 %
+            Memory Utilization      : 0 %
+            Max memory usage        : 771 MiB
+            Time                    : 12182626 ms
+            Is Running              : 0
+        Process ID                  : 16462
+            GPU Utilization         : 0 %
+            Memory Utilization      : 0 %
+            Max memory usage        : 617 MiB
+            Time                    : 0 ms
+            Is Running              : 1
+        Process ID                  : 28280
+            GPU Utilization         : 0 %
+            Memory Utilization      : 0 %
+            Max memory usage        : 0 MiB
+            Time                    : 0 ms
+            Is Running              : 1
+
+Mon Dec 10 07:18:52 2018       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 396.37                 Driver Version: 396.37                    |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|===============================+======================+======================|
+|   0  GeForce GTX 1050    Off  | 00000000:05:00.0  On |                  N/A |
+| 34%   55C    P8    N/A /  75W |     39MiB /  1999MiB |      0%      Default |
++-------------------------------+----------------------+----------------------+
+|   1  TITAN X (Pascal)    Off  | 00000000:09:00.0 Off |                  N/A |
+| 38%   64C    P2    58W / 250W |    629MiB / 12196MiB |      0%      Default |
++-------------------------------+----------------------+----------------------+
+                                                                               
++-----------------------------------------------------------------------------+
+| Processes:                                                       GPU Memory |
+|  GPU       PID   Type   Process name                             Usage      |
+|=============================================================================|
+|    0      1380      G   /usr/bin/X                                    37MiB |
++-----------------------------------------------------------------------------+

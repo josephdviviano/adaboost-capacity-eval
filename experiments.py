@@ -55,7 +55,7 @@ def logistic_regression(data, n_estimators, experiment_name, estimator=None, boo
 
     storage = {'train_acc': [], 'test_acc': [], 'train_f1': [], 'test_f1': []}
     for n_learners in param_pairs:
-        model = models.boosted_LR(estimator, n_learners=n_learners)
+        model = models.boosted_LR(clone(estimator), n_learners=n_learners)
         results, _ = kfold_train_loop(data, model)
         storage['train_acc'].append(results['train']['accuracy'])
         storage['test_acc'].append(results['test']['accuracy'])
@@ -100,7 +100,7 @@ def svm(data, n_estimators, experiment_name, estimator=None, boosted=False):
 
     storage = {'train_acc': [], 'test_acc': [], 'train_f1': [], 'test_f1': []}
     for C, n_learners in param_pairs:
-        model = models.boosted_SVM(estimator, C=C, n_learners=n_learners)
+        model = models.boosted_SVM(clone(estimator), C=C, n_learners=n_learners)
         results, _ = kfold_train_loop(data, model)
         storage['train_acc'].append(results['train']['accuracy'])
         storage['test_acc'].append(results['test']['accuracy'])
@@ -201,7 +201,7 @@ def mlp(data, n_estimators, experiment_name, estimator=None, boosted=False):
 
     storage = {'train_acc': [], 'test_acc': [], 'train_f1': [], 'test_f1': []}
     for n_hid, n_learners in param_pairs:
-        model = models.boosted_mlp(estimator, n_hid=n_hid, n_learners=n_learners)
+        model = models.boosted_mlp(clone(estimator), n_hid=n_hid, n_learners=n_learners)
         boosted_results, boosted_best_model = kfold_train_loop(data, model)
         storage['train_acc'].append(boosted_results['train']['accuracy'])
         storage['test_acc'].append(boosted_results['test']['accuracy'])
